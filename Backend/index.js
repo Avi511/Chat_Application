@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
 import http from 'http';
 import { connectDB } from './utils/db.js';
+import authRoutes from './routes/authRoutes.js';
 
 dotenv.config();
 
@@ -24,6 +25,10 @@ app.use(cors({
     credentials: true,
 }));
 app.use(cookieParser());
+app.use(express.json());
+
+
+app.use("/api/auth", authRoutes);
 
 try {
     const PORT = process.env.PORT || 5000;
