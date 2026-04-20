@@ -73,7 +73,7 @@ const Auth = () => {
 
             {/* Right Side */}
             <div className="relative z-10 w-full md:w-1/2 flex items-center justify-center px-6 py-10 sm:px-10">
-                <div className="w-full max-w-md rounded-3xl border border-cyan-400/20 bg-white/5 backdrop-blur-xl shadow-xl p-8 sm:p-10">
+                <div className="w-full max-w-2xl rounded-3xl border border-cyan-400/20 bg-white/5 backdrop-blur-xl shadow-xl p-8 sm:p-10">
                     <div className="mb-8 text-center">
                         <p className="text-cyan-400 text-xs uppercase tracking-[0.35em] font-semibold mb-3">
                             {isLogin ? "Login" : "Register"}
@@ -93,7 +93,7 @@ const Auth = () => {
                     {isLogin ? (
                         <LoginForm navigate={navigate} />
                     ) : (
-                        <RegisterForm navigate={navigate} />
+                        <RegisterForm navigate={navigate} onSuccess={() => setIsLogin(true)} />
                     )}
 
                     <div className="mt-8 text-center border-t border-white/10 pt-6">

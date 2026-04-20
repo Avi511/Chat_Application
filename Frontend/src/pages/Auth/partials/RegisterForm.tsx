@@ -22,9 +22,10 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 interface RegisterFormProps {
     navigate: NavigateFunction;
+    onSuccess: () => void;
 }
 
-const RegisterForm = ({ navigate }: RegisterFormProps) => {
+const RegisterForm = ({ navigate, onSuccess }: RegisterFormProps) => {
     const { register: registerUser, isLoading } = useAuthStore();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -45,63 +46,67 @@ const RegisterForm = ({ navigate }: RegisterFormProps) => {
                 email: data.email,
                 password: data.password
             });
-            toast.success("Account created successfully!");
-            navigate("/chat");
+            toast.success("Account created successfully! Please login.");
+            onSuccess();
         } catch (error: any) {
             toast.error(error.message || "Registration failed");
         }
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Full Name
-                </label>
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
-                        <User size={18} />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Full Name and Username Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2 pl-1">
+                        Full Name
+                    </label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                            <User size={18} />
+                        </div>
+                        <input
+                            {...register("name")}
+                            type="text"
+                            placeholder="John Doe"
+                            className={`w-full pl-11 pr-4 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.name
+                                ? "border-red-500/70 focus:ring-red-500/30"
+                                : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
+                                }`}
+                        />
                     </div>
-                    <input
-                        {...register("name")}
-                        type="text"
-                        placeholder="John Doe"
-                        className={`w-full pl-11 pr-4 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.name
-                            ? "border-red-500/70 focus:ring-red-500/30"
-                            : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
-                            }`}
-                    />
+                    {errors.name && (
+                        <p className="mt-2 text-xs text-red-400 pl-1">{errors.name.message}</p>
+                    )}
                 </div>
-                {errors.name && (
-                    <p className="mt-2 text-xs text-red-400">{errors.name.message}</p>
-                )}
+
+                <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2 pl-1">
+                        Username
+                    </label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                            <AtSign size={18} />
+                        </div>
+                        <input
+                            {...register("username")}
+                            type="text"
+                            placeholder="johndoe_22"
+                            className={`w-full pl-11 pr-4 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.username
+                                ? "border-red-500/70 focus:ring-red-500/30"
+                                : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
+                                }`}
+                        />
+                    </div>
+                    {errors.username && (
+                        <p className="mt-2 text-xs text-red-400 pl-1">{errors.username.message}</p>
+                    )}
+                </div>
             </div>
 
+            {/* Email Address - Full Width */}
             <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Username
-                </label>
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
-                        <AtSign size={18} />
-                    </div>
-                    <input
-                        {...register("username")}
-                        type="text"
-                        placeholder="johndoe_22"
-                        className={`w-full pl-11 pr-4 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.username
-                            ? "border-red-500/70 focus:ring-red-500/30"
-                            : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
-                            }`}
-                    />
-                </div>
-                {errors.username && (
-                    <p className="mt-2 text-xs text-red-400">{errors.username.message}</p>
-                )}
-            </div>
-
-            <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-slate-300 mb-2 pl-1">
                     Email Address
                 </label>
                 <div className="relative">
@@ -119,68 +124,71 @@ const RegisterForm = ({ navigate }: RegisterFormProps) => {
                     />
                 </div>
                 {errors.email && (
-                    <p className="mt-2 text-xs text-red-400">{errors.email.message}</p>
+                    <p className="mt-2 text-xs text-red-400 pl-1">{errors.email.message}</p>
                 )}
             </div>
 
-            <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Password
-                </label>
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
-                        <Lock size={18} />
+            {/* Password and Confirm Password Row */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2 pl-1">
+                        Password
+                    </label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                            <Lock size={18} />
+                        </div>
+                        <input
+                            {...register("password")}
+                            type={showPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            className={`w-full pl-11 pr-12 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.password
+                                ? "border-red-500/70 focus:ring-red-500/30"
+                                : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
+                                }`}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-cyan-400 transition-colors"
+                        >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
                     </div>
-                    <input
-                        {...register("password")}
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        className={`w-full pl-11 pr-12 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.password
-                            ? "border-red-500/70 focus:ring-red-500/30"
-                            : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
-                            }`}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-cyan-400 transition-colors"
-                    >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
+                    {errors.password && (
+                        <p className="mt-2 text-xs text-red-400 pl-1">{errors.password.message}</p>
+                    )}
                 </div>
-                {errors.password && (
-                    <p className="mt-2 text-xs text-red-400">{errors.password.message}</p>
-                )}
-            </div>
 
-            <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Confirm Password
-                </label>
-                <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
-                        <ShieldCheck size={18} />
+                <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2 pl-1">
+                        Confirm Password
+                    </label>
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                            <ShieldCheck size={18} />
+                        </div>
+                        <input
+                            {...register("confirmPassword")}
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="••••••••"
+                            className={`w-full pl-11 pr-12 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.confirmPassword
+                                ? "border-red-500/70 focus:ring-red-500/30"
+                                : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
+                                }`}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-cyan-400 transition-colors"
+                        >
+                            {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
                     </div>
-                    <input
-                        {...register("confirmPassword")}
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        className={`w-full pl-11 pr-12 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.confirmPassword
-                            ? "border-red-500/70 focus:ring-red-500/30"
-                            : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
-                            }`}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-500 hover:text-cyan-400 transition-colors"
-                    >
-                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
+                    {errors.confirmPassword && (
+                        <p className="mt-2 text-xs text-red-400 pl-1">{errors.confirmPassword.message}</p>
+                    )}
                 </div>
-                {errors.confirmPassword && (
-                    <p className="mt-2 text-xs text-red-400">{errors.confirmPassword.message}</p>
-                )}
             </div>
 
             <button

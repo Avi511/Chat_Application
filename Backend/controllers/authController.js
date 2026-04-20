@@ -58,16 +58,19 @@ class AuthController {
 
     static async login(req, res) {
         try {
-            let { email, password } = req.body;
+            let { identifier, password } = req.body;
 
-            email = email?.trim().toLowerCase();
+            identifier = identifier?.trim();
             password = password?.trim();
 
-            if (!email || !password) {
+            if (!identifier || !password) {
                 return res.status(400).json({ message: "All fields are required" });
             }
 
-            const user = await User.findOne({ email });
+            const user = await User.findOne({
+                $or: [{ email: identifier.toLowerCase() }, { username: identifier }]
+            });
+
             if (!user) {
                 return res.status(404).json({ message: "User not found" });
             }

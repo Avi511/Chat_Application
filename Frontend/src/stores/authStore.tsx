@@ -54,9 +54,10 @@ export const useAuthStore = create<AuthStore>()(
                     });
                 } catch (error: any) {
                     set({
-                        error: error?.message || "Registration failed",
+                        error: error?.response?.data?.message || error?.message || "Registration failed",
                         isLoading: false,
                     });
+                    throw error;
                 }
             },
 
@@ -72,9 +73,10 @@ export const useAuthStore = create<AuthStore>()(
                     });
                 } catch (error: any) {
                     set({
-                        error: error?.message || "Login failed",
+                        error: error?.response?.data?.message || error?.message || "Login failed",
                         isLoading: false,
                     });
+                    throw error;
                 }
             },
 
@@ -90,9 +92,10 @@ export const useAuthStore = create<AuthStore>()(
                     });
                 } catch (error: any) {
                     set({
-                        error: error?.message || "Logout failed",
+                        error: error?.response?.data?.message || error?.message || "Logout failed",
                         isLoading: false,
                     });
+                    throw error;
                 }
             },
 
@@ -107,11 +110,12 @@ export const useAuthStore = create<AuthStore>()(
                     });
                 } catch (error: any) {
                     set({
-                        error: error?.message || "Failed to fetch user",
+                        error: error?.response?.data?.message || error?.message || "Failed to fetch user",
                         isLoading: false,
                         user: null,
                         isAuthenticated: false,
                     });
+                    throw error;
                 }
             },
         }),
