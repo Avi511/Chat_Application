@@ -10,7 +10,7 @@ function App() {
         <Route path="/" element={<Auth />} />
         <Route path="/chat" element={<Chat />} />
       </Routes>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" richColors duration={2000} toastOptions={{ style: { fontSize: '16px', textAlign: 'center', width: '400px' } }} />
     </>
   );
 }
