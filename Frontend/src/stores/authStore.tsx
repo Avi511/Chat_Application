@@ -5,6 +5,7 @@ import { authService } from "../services/authServices";
 export type User = {
     id: string;
     name: string;
+    username: string;
     email: string;
     avatar?: string;
     bio?: string;
@@ -20,8 +21,8 @@ interface AuthStore {
     isLoading: boolean;
     error: string | null;
     setUser: (user: User | null) => void;
-    register: (userData: { name: string; email: string; password: string }) => Promise<void>;
-    login: (userData: { email: string; password: string }) => Promise<void>;
+    register: (userData: { name: string; username: string; email: string; password: string }) => Promise<void>;
+    login: (userData: { identifier: string; password: string }) => Promise<void>;
     logout: () => Promise<void>;
     getCurrentUser: () => Promise<void>;
 }
