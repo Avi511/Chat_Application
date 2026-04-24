@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import { connectDB } from './utils/db.js';
 import authRoutes from './routes/authRoutes.js';
+import conversationRoutes from './routes/conversationRoutes.js';
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use(express.json());
 
 
 app.use("/api/auth", authRoutes);
+app.use("/api/conversations", conversationRoutes);
 
 try {
     const PORT = process.env.PORT || 5000;
