@@ -8,7 +8,7 @@ class ConversationController {
     static async checkConnectCode(req, res) {
         try {
             const userId = req.user.id;
-            const { connectCode } = req.body;
+            const { connectCode } = req.query;
             const friend = await User.findOne({ connectCode });
             if (!friend || friend.id === userId) {
                 return res.status(404).json({ message: "Invalid connect code" });
@@ -97,8 +97,8 @@ class ConversationController {
                             name: isRequester ? friendship.recipient.name : friendship.requester.name,
                             avatar: isRequester ? friendship.recipient.avatar : friendship.requester.avatar,
                             connectCode: isRequester ? friendship.recipient.connectCode : friendship.requester.connectCode,
-                            online: isOnlineMap.get(friendId.toString()) || false,
-                            lastSeen: isOnlineMap.get(friendId.toString()) ? null : "Recent activity", //@TODO: use redis to get last seen
+                            online: false,
+                            lastSeen: "Recent activity", //@TODO: use redis or socket map to get real-time status
                         },
                         friendshipId: friendship._id.toString()
                     };
@@ -109,6 +109,28 @@ class ConversationController {
         } catch (error) {
             console.error("Error getting conversations:", error);
             res.status(500).json({ message: "Error getting conversations" });
+        }
+    }
+    static async getMessages(req, res) {
+        try {
+            const { conversationId } = req.params;
+            const userId = req.user.id;
+
+            const messages = await Message.find({ conversationId })
+                .sort({ createdAt: 1 })
+                .lean();
+
+            // Clear unread counts for this user in this conversation
+            await Conversation.findByIdAndUpdate(conversationId, {
+                $set: {
+                    [`unreadCounts.${userId.toString()}`]: 0
+                }
+            });
+
+            res.status(200).json({ success: true, data: messages });
+        } catch (error) {
+            console.error("Error getting messages:", error);
+            res.status(500).json({ message: "Error getting messages" });
         }
     }
 }
