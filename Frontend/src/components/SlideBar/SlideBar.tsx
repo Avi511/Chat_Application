@@ -2,6 +2,7 @@ import Header from "./Header";
 import SearchBar from "./SearchBar";
 import Conversations from "./Conversations";
 import UserProfile from "./UserProfile";
+import { ConversationProvider } from "../../context/ConversationContext";
 
 const SideBar = () => {
     return (

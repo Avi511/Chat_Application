@@ -37,6 +37,9 @@ type ConversationContextType = {
     isLoading: boolean;
     fetchConversations: () => Promise<void>;
     isError: boolean;
+
+    activeConversationId: string | null;
+    setActiveConversationId: (id: string | null) => void;
 }
 
 const ConversationContext = createContext<ConversationContextType | undefined>(undefined);
@@ -56,6 +59,7 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
     const [searchType, setSearchType] = useState<"all" | "unread" | "group" | "pin">("all");
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
+    const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
 
     const fetchConversations = async () => {
         setIsLoading(true);
@@ -106,7 +110,9 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
             setSearchType,
             isLoading,
             fetchConversations,
-            isError
+            isError,
+            activeConversationId,
+            setActiveConversationId
         }}>
             {children}
         </ConversationContext.Provider>
