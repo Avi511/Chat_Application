@@ -28,19 +28,26 @@ messageSchema.index({ conversationId: 1, createdAt: -1 });
 messageSchema.index({ sender: 1, createdAt: -1 });
 messageSchema.post("save", async function (doc) {
     try {
-        const conversation = mongoose.model("Conversation");
-        const preview = {
-            content: doc.content,
-            timestamps: doc.createdAt
+        const conv = await mongoose.model("Conversation").findById(doc.conversationId);
+        if (conv) {
+            const recipientId = conv.participants.find(p => p.toString() !== doc.sender.toString());
+            await mongoose.model("Conversation").findByIdAndUpdate(doc.conversationId, {
+                $set: {
+                    lastMessage: doc._id,
+                    lastMessagePreview: {
+                        content: doc.content,
+                        timestamp: doc.createdAt
+                    }
+                },
+                $inc: {
+                    [`unreadCounts.${recipientId.toString()}`]: 1
+                }
+            });
         }
-        await conversation.findByIdAndUpdate(doc.conversationId, {
-            lastMessage: doc._id,
-            lastMessagePreview: preview
-        });
     } catch (error) {
         console.error("Error updating conversation after message save:", error);
     }
 });
 
-const Message = mongoose.model("Message", messageSchema);
+const Message = mongoose.models.Message || mongoose.model("Message", messageSchema);
 export default Message;

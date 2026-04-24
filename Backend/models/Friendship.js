@@ -17,5 +17,5 @@ const friendshipSchema = new mongoose.Schema({
 
 friendshipSchema.index({ requester: 1, receiver: 1 }, { unique: true });
 
-const Friendship = mongoose.model("Friendship", friendshipSchema);
+const Friendship = mongoose.models.Friendship || mongoose.model("Friendship", friendshipSchema);
 export default Friendship;

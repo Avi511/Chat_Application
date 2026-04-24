@@ -13,12 +13,13 @@ const conversationSchema = new mongoose.Schema({
         default: null,
     },
     lastMessagePreview: {
-        type: String,
-        default: "",
+        content: { type: String, default: "" },
+        timestamp: { type: Date, default: Date.now }
     },
-    unreadCount: {
-        type: Number,
-        default: 0,
+    unreadCounts: {
+        type: Map,
+        of: Number,
+        default: {},
     },
 }, { timestamps: true });
 
@@ -30,5 +31,5 @@ conversationSchema.pre("save", function (next) {
     next();
 });
 
-const Conversation = mongoose.model("Conversation", conversationSchema);
+const Conversation = mongoose.models.Conversation || mongoose.model("Conversation", conversationSchema);
 export default Conversation;
