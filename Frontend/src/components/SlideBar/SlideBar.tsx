@@ -8,8 +8,10 @@ const SideBar = () => {
     return (
         <aside className="w-full md:w-80 h-screen bg-slate-950/95 border-r border-white/5 text-white flex flex-col shadow-2xl z-20">
             <Header />
-            <SearchBar />
-            <Conversations />
+            <ConversationProvider>
+                <SearchBar />
+                <Conversations />
+            </ConversationProvider>
             <UserProfile />
         </aside>
     );
