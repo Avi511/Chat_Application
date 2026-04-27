@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { Server } from 'socket.io';
+import { initializeSocket } from './socket.js';
 import http from 'http';
 import { connectDB } from './utils/db.js';
 import authRoutes from './routes/authRoutes.js';
@@ -16,9 +17,12 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: process.env.CLIENT_ORIGIN,
+        credentials: true,
         methods: ["GET", "POST"]
-    }
+    },
+    pingTimeout: 60000,
+    pingInterval: 25000,
 });
 
 app.use(cors({
@@ -31,6 +35,8 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/conversations", conversationRoutes);
+
+initializeSocket(io);
 
 try {
     const PORT = process.env.PORT || 5000;

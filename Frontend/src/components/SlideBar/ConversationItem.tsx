@@ -32,11 +32,10 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ conversation, isAct
     return (
         <button
             onClick={() => onClick(conversationId)}
-            className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all duration-300 group relative border ${
-                isActive
+            className={`w-full flex items-center gap-4 p-3 rounded-2xl transition-all duration-300 group relative border ${isActive
                     ? "bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border-cyan-500/20 shadow-[0_8px_32px_0_rgba(0,255,255,0.1)] backdrop-blur-md"
                     : "hover:bg-white/5 border-transparent hover:border-white/5"
-            }`}
+                }`}
         >
             {/* Active Indicator Bar */}
             {isActive && (
@@ -46,9 +45,8 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ conversation, isAct
             {/* Avatar Section */}
             <div className="relative shrink-0">
                 <div
-                    className={`p-0.5 rounded-2xl transition-all duration-500 ${
-                        isActive ? "bg-gradient-to-tr from-cyan-500 to-blue-500" : "bg-transparent group-hover:bg-white/10"
-                    }`}
+                    className={`p-0.5 rounded-2xl transition-all duration-500 ${isActive ? "bg-gradient-to-tr from-cyan-500 to-blue-500" : "bg-transparent group-hover:bg-white/10"
+                        }`}
                 >
                     {friend.avatar ? (
                         <img
@@ -75,16 +73,14 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ conversation, isAct
             <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center justify-between gap-2">
                     <h3
-                        className={`text-sm font-bold truncate transition-colors duration-300 ${
-                            isActive ? "text-white" : "text-slate-200 group-hover:text-white"
-                        }`}
+                        className={`text-sm font-bold truncate transition-colors duration-300 ${isActive ? "text-white" : "text-slate-200 group-hover:text-white"
+                            }`}
                     >
                         {friend.name}
                     </h3>
                     <span
-                        className={`text-[10px] font-medium shrink-0 transition-colors duration-300 ${
-                            isActive ? "text-cyan-400/80" : "text-slate-500 group-hover:text-slate-400"
-                        }`}
+                        className={`text-[10px] font-medium shrink-0 transition-colors duration-300 ${isActive ? "text-cyan-400/80" : "text-slate-500 group-hover:text-slate-400"
+                            }`}
                     >
                         {lastMessage ? formatTime(lastMessage.timestamp) : ""}
                     </span>
@@ -92,9 +88,8 @@ const ConversationItem: React.FC<ConversationItemProps> = ({ conversation, isAct
 
                 <div className="flex items-center justify-between gap-2 mt-0.5">
                     <p
-                        className={`text-xs truncate transition-colors duration-300 ${
-                            isActive ? "text-slate-300" : "text-slate-500 group-hover:text-slate-400"
-                        }`}
+                        className={`text-xs truncate transition-colors duration-300 ${isActive ? "text-slate-300" : "text-slate-500 group-hover:text-slate-400"
+                            }`}
                     >
                         {lastMessage?.content || "Start a conversation"}
                     </p>

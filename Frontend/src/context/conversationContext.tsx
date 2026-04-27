@@ -1,5 +1,7 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { conversationService } from "../services/conversationService";
+import { useAuthStore } from "../stores/authStore";
+import { useSocket } from "./SocketContext";
 
 export type Message = {
     messageId: string;
@@ -60,8 +62,11 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+    const { user, isAuthenticated } = useAuthStore();
+    const { onlineUsers } = useSocket();
 
     const fetchConversations = async () => {
+        if (!isAuthenticated) return;
         setIsLoading(true);
         setIsError(false);
         try {
@@ -77,11 +82,24 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
     };
 
     useEffect(() => {
-        fetchConversations();
-    }, []);
+        if (isAuthenticated) {
+            fetchConversations();
+        }
+    }, [isAuthenticated]);
+
+    // Compute conversations with real-time online status
+    const conversationsWithStatus = useMemo(() => {
+        return conversations.map(conv => ({
+            ...conv,
+            friend: {
+                ...conv.friend,
+                online: onlineUsers.includes(conv.friend._id)
+            }
+        }));
+    }, [conversations, onlineUsers]);
 
     useEffect(() => {
-        let filtered = [...conversations];
+        let filtered = [...conversationsWithStatus];
 
         if (searchType === "unread") {
             filtered = filtered.filter(conv => {
@@ -102,7 +120,7 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
 
     return (
         <ConversationContext.Provider value={{
-            conversations,
+            conversations: conversationsWithStatus,
             filteredConversations,
             searchTerm,
             setSearchTerm,
