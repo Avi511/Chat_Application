@@ -57,6 +57,14 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 fetchConversations();
             });
 
+            socketClient.on("connect_error", (err) => {
+                console.error("Socket connection error:", err.message);
+            });
+
+            socketClient.on("disconnect", () => {
+                console.log("Socket disconnected");
+            });
+
             return () => {
                 socketClient.close();
                 setSocket(null);

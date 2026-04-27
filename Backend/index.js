@@ -8,6 +8,7 @@ import http from 'http';
 import { connectDB } from './utils/db.js';
 import authRoutes from './routes/authRoutes.js';
 import conversationRoutes from './routes/conversationRoutes.js';
+import { socketAuthMiddleware } from './socket/socketAuthMiddleware.js';
 
 dotenv.config();
 
@@ -24,6 +25,9 @@ const io = new Server(server, {
     pingTimeout: 60000,
     pingInterval: 25000,
 });
+
+app.set("io", io);
+io.use(socketAuthMiddleware);
 
 app.use(cors({
     origin: process.env.CLIENT_ORIGIN,

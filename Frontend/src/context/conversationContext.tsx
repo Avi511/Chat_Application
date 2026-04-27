@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { conversationService } from "../services/conversationService";
 import { useAuthStore } from "../stores/authStore";
 import { useSocket } from "./SocketContext";
-
 export type Message = {
     messageId: string;
     senderId: string;
@@ -63,7 +62,7 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
     const [isError, setIsError] = useState(false);
     const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
     const { user, isAuthenticated } = useAuthStore();
-    const { onlineUsers } = useSocket();
+    const { socket, onlineUsers } = useSocket();
 
     const fetchConversations = async () => {
         if (!isAuthenticated) return;
@@ -87,7 +86,17 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
         }
     }, [isAuthenticated]);
 
-    // Compute conversations with real-time online status
+    useEffect(() => {
+        if (socket && activeConversationId) {
+            const activeConv = conversations.find(
+                c => c.conversationId === activeConversationId || c.friend._id === activeConversationId
+            );
+            if (activeConv) {
+                socket.emit("newConversation", { friendId: activeConv.friend._id });
+            }
+        }
+    }, [socket, activeConversationId, conversations]);
+
     const conversationsWithStatus = useMemo(() => {
         return conversations.map(conv => ({
             ...conv,
