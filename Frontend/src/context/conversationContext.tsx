@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, useRef } from "react";
+import { toast } from "sonner";
 import { conversationService } from "../services/conversationService";
 import { useAuthStore } from "../stores/authStore";
 import { useSocket } from "./SocketContext";
@@ -64,14 +65,53 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
     const { user, isAuthenticated } = useAuthStore();
     const { socket, onlineUsers } = useSocket();
 
+    const prevOnlineUsers = useRef<string[]>(onlineUsers);
+    const conversationsRef = useRef(conversations);
+    const isReadyForToasts = useRef(false);
+
+    useEffect(() => {
+        conversationsRef.current = conversations;
+    }, [conversations]);
+
+    // Prevent toast spam on initial load by waiting 3 seconds
+    useEffect(() => {
+        if (isAuthenticated) {
+            const timer = setTimeout(() => {
+                isReadyForToasts.current = true;
+            }, 3000);
+            return () => clearTimeout(timer);
+        } else {
+            isReadyForToasts.current = false;
+        }
+    }, [isAuthenticated]);
+
+    // Detect when a friend comes online
+    useEffect(() => {
+        if (isReadyForToasts.current) {
+            const newlyOnline = onlineUsers.filter(id => !prevOnlineUsers.current.includes(id));
+            
+            newlyOnline.forEach(id => {
+                const friendConv = conversationsRef.current.find(c => c.friend._id === id);
+                if (friendConv) {
+                    toast.info(`${friendConv.friend.name || friendConv.friend.username} is online`, {
+                        id: `online_${id}`
+                    });
+                }
+            });
+        }
+        prevOnlineUsers.current = onlineUsers;
+    }, [onlineUsers]);
+
     const fetchConversations = async () => {
         if (!isAuthenticated) return;
         setIsLoading(true);
         setIsError(false);
         try {
             const response = await conversationService.getConversations();
-            setConversations(response.data);
-            setFilteredConversations(response.data);
+            // Handle different response formats from the backend safely
+            const conversationsArray = Array.isArray(response) ? response : (response.data || []);
+            setConversations(conversationsArray);
+            setFilteredConversations(conversationsArray);
         } catch (error) {
             setIsError(true);
             console.error("Error fetching conversations:", error);

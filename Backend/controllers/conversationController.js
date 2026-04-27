@@ -1,8 +1,8 @@
 import Conversation from "../models/Conversation.js";
 import Message from "../models/Message.js";
 import User from "../models/User.js";
-import Friendship from "../models/FriendShip.js";
-import { connect } from "mongoose";
+import Friendship from "../models/Friendship.js";
+import redisService from "../services/RedisService.js";
 
 class ConversationController {
     static async checkConnectCode(req, res) {
@@ -85,6 +85,8 @@ class ConversationController {
 
                     if (!conversation) return null;
 
+                    const isOnline = await redisService.isUserOnline(friendId.toString());
+
                     return {
                         conversationId: conversation._id,
                         lastMessage: conversation.lastMessagePreview || null,
@@ -97,8 +99,8 @@ class ConversationController {
                             name: isRequester ? friendship.recipient.name : friendship.requester.name,
                             avatar: isRequester ? friendship.recipient.avatar : friendship.requester.avatar,
                             connectCode: isRequester ? friendship.recipient.connectCode : friendship.requester.connectCode,
-                            online: false,
-                            lastSeen: "Recent activity", //@TODO: use redis or socket map to get real-time status
+                            online: isOnline,
+                            lastSeen: isOnline ? "Online" : "Recent activity",
                         },
                         friendshipId: friendship._id.toString()
                     };

@@ -9,6 +9,7 @@ import { connectDB } from './utils/db.js';
 import authRoutes from './routes/authRoutes.js';
 import conversationRoutes from './routes/conversationRoutes.js';
 import { socketAuthMiddleware } from './socket/socketAuthMiddleware.js';
+import redisService from "./services/RedisService.js";
 
 dotenv.config();
 
@@ -41,6 +42,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/conversations", conversationRoutes);
 
 initializeSocket(io);
+
+redisService.initialize();
 
 try {
     const PORT = process.env.PORT || 5000;
