@@ -99,8 +99,8 @@ class ConversationController {
                             name: isRequester ? friendship.recipient.name : friendship.requester.name,
                             avatar: isRequester ? friendship.recipient.avatar : friendship.requester.avatar,
                             connectCode: isRequester ? friendship.recipient.connectCode : friendship.requester.connectCode,
-                            online: isOnline,
-                            lastSeen: isOnline ? "Online" : "Recent activity",
+                            online: await redisService.isUserOnline(friendId.toString()),
+                            lastSeen: await redisService.isUserOnline(friendId.toString()) ? "Online" : "Recent activity",
                         },
                         friendshipId: friendship._id.toString()
                     };
