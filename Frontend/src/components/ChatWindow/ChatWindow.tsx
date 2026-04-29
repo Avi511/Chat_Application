@@ -7,7 +7,7 @@ import MessageList from "./MessageList.tsx";
 const ChatWindow: React.FC = () => {
     const { activeConversationId } = useConversationStore();
 
-    return <div className="h-screen w-full bg-slate-950 flex flex-col justify-between overflow-hidden">
+    return <div className="h-screen w-full bg-transparent flex flex-col justify-between overflow-hidden">
         <div className="z-10 flex flex-col h-full w-full">
             {activeConversationId ? (
                 <>

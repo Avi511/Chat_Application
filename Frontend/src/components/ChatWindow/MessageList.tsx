@@ -59,12 +59,12 @@ const MessageList: React.FC = () => {
     )
 
     if (isLoading) {
-        return <div className="relative flex-1 h-full flex items-center justify-center bg-slate-950">
+        return <div className="relative flex-1 h-full flex items-center justify-center bg-transparent">
             <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
         </div>
     }
 
-    return <div ref={containerRef} className="flex-1 bg-slate-950 overflow-y-auto p-4 pb-10">
+    return <div ref={containerRef} className="flex-1 bg-transparent overflow-y-auto p-4 pb-10">
         {hasNextPage && <div className="flex justify-center mb-6 mt-2">
             <button
                 type="button"

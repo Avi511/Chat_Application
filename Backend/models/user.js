@@ -1,11 +1,12 @@
 import mongoose, { connect } from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    connectCode: {
+    mobileNumber: {
         type: String,
         required: true,
         unique: true,
-        index: true
+        index: true,
+        match: [/^\d{10,15}$/, 'Please enter a valid mobile number']
     },
     fullName: {
         type: String,

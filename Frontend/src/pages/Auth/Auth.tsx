@@ -19,10 +19,8 @@ const Auth = () => {
             <div className="relative z-10 w-full md:w-1/2 flex items-center justify-center px-8 py-14 border-b md:border-b-0 md:border-r border-white/10">
                 <div className="max-w-lg">
                     <div className="flex items-center gap-4 mb-8">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_30px_rgba(34,211,238,0.35)]">
-                            <span className="text-white text-2xl font-extrabold tracking-wider">
-                                Z
-                            </span>
+                        <div className="w-14 h-14 flex items-center justify-center">
+                            <img src="/logo.png" alt="Chat Pad Logo" className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(34,211,238,0.5)]" />
                         </div>
                         <div>
                             <p className="text-cyan-400 text-sm uppercase tracking-[0.3em] font-semibold">
@@ -34,40 +32,6 @@ const Auth = () => {
                         </div>
                     </div>
 
-                    <p className="text-slate-300 text-lg leading-relaxed mb-8">
-                        A focused, distraction-free communication platform designed for clarity,
-                        speed, and seamless collaboration.
-                    </p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="rounded-2xl border border-cyan-400/20 bg-white/5 backdrop-blur-md p-4">
-                            <h3 className="text-white font-semibold">Realtime Chat</h3>
-                            <p className="text-slate-400 text-sm mt-1">
-                                Instant messaging with smooth performance.
-                            </p>
-                        </div>
-
-                        <div className="rounded-2xl border border-blue-400/20 bg-white/5 backdrop-blur-md p-4">
-                            <h3 className="text-white font-semibold">Secure Access</h3>
-                            <p className="text-slate-400 text-sm mt-1">
-                                Reliable authentication and protected sessions.
-                            </p>
-                        </div>
-
-                        <div className="rounded-2xl border border-sky-400/20 bg-white/5 backdrop-blur-md p-4">
-                            <h3 className="text-white font-semibold">Minimal UI</h3>
-                            <p className="text-slate-400 text-sm mt-1">
-                                Clean design that keeps you focused.
-                            </p>
-                        </div>
-
-                        <div className="rounded-2xl border border-indigo-400/20 bg-white/5 backdrop-blur-md p-4">
-                            <h3 className="text-white font-semibold">Team Ready</h3>
-                            <p className="text-slate-400 text-sm mt-1">
-                                Built for collaboration and productivity.
-                            </p>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -75,9 +39,7 @@ const Auth = () => {
             <div className="relative z-10 w-full md:w-1/2 flex items-center justify-center px-6 py-10 sm:px-10">
                 <div className="w-full max-w-2xl rounded-3xl border border-cyan-400/20 bg-white/5 backdrop-blur-xl shadow-xl p-8 sm:p-10">
                     <div className="mb-8 text-center">
-                        <p className="text-cyan-400 text-xs uppercase tracking-[0.35em] font-semibold mb-3">
-                            {isLogin ? "Login" : "Register"}
-                        </p>
+
 
                         <h2 className="text-3xl font-bold text-white">
                             {isLogin ? "Welcome to Chat Pad" : "Join Chat Pad"}

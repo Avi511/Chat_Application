@@ -31,7 +31,7 @@ const UserProfile = () => {
     if (!user) return null;
 
     return (
-        <div className="p-4 border-t border-white/10 bg-slate-900 flex items-center justify-between">
+        <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between">
             <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center font-bold text-cyan-400 border border-white/10">
                     {user.fullName?.charAt(0).toUpperCase() || user.username?.charAt(0).toUpperCase()}

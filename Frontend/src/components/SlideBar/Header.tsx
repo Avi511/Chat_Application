@@ -7,8 +7,9 @@ const Header: React.FC = () => {
 
     return (
         <div className="flex items-center justify-between px-4 py-4">
-            <div>
-                <h1 className="text-xl text-white font-bold tracking-wide">Messages</h1>
+            <div className="flex items-center gap-2">
+                <img src="/logo.png" alt="Chat Pad" className="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]" />
+                <h1 className="text-xl text-white font-bold tracking-wide">Chat Pad</h1>
             </div>
 
             <div className="flex items-center gap-2">

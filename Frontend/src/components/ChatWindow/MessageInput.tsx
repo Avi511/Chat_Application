@@ -62,7 +62,7 @@ const MessageInput: React.FC = () => {
     };
 
 
-    return <div className="p-4 border-t border-white/10 bg-slate-900 z-10">
+    return <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-md z-10">
         <div className="flex items-center max-w-4xl mx-auto">
             <div className="flex-1 relative">
                 <textarea

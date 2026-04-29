@@ -8,7 +8,7 @@ const ChatHeader: React.FC = () => {
 
     if (!selectedConversation) return null;
 
-    return <div className="p-4 border-b border-white/10 bg-slate-900 flex items-center justify-between z-10">
+    return <div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between z-10">
         <div className="flex items-center space-x-3">
             <div className="relative">
                 <img 
