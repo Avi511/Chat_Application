@@ -109,15 +109,6 @@ const Auth = () => {
                         </p>
                     </div>
 
-                    <div className="mt-5 text-center">
-                        <button
-                            type="button"
-                            onClick={() => navigate("/")}
-                            className="text-sm text-slate-500 hover:text-cyan-400 transition"
-                        >
-                            ← Back to Home
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>

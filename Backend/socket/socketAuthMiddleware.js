@@ -10,13 +10,13 @@ export const socketAuthMiddleware = async (socket, next) => {
             return next(new Error("Unauthorized"));
         }
         const parsedCookie = cookie.parse(cookieHeader);
-        const token = parsedCookie.token; // The cookie name is 'token', not 'jwt'
+        const token = parsedCookie.jwt || parsedCookie.token;
         if (!token) {
             console.log("Socket Auth Failed: Token not found in cookies");
             return next(new Error("Unauthorized"));
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findById(decoded.id).select("-password");
+        const user = await User.findById(decoded.userId || decoded.id).select("-password");
         if (!user) {
             console.log("Socket Auth Failed: User not found in database");
             return next(new Error("User not found"));

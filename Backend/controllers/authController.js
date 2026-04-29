@@ -121,6 +121,7 @@ class AuthController {
 
     static async logout(req, res) {
         res.cookie("jwt", "", { maxAge: 0 });
+        res.cookie("token", "", { maxAge: 0 });
         res.json({ message: "Logged out successfully!" });
     }
 }

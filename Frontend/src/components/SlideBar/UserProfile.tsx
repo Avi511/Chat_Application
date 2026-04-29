@@ -13,7 +13,7 @@ const UserProfile = () => {
         try {
             await logout();
             toast.success("Logged out successfully");
-            navigate("/");
+            navigate("/auth");
         } catch (error) {
             toast.error("Logout failed");
         }

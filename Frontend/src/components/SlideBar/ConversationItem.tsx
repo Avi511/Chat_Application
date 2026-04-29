@@ -54,12 +54,12 @@ const ConversationItem: React.FC<Conversation> = ({
                 {friend.avatar ? (
                     <img
                         src={friend.avatar}
-                        alt={friend.name || friend.username}
+                        alt={friend.fullName || friend.username}
                         className="w-12 h-12 rounded-full object-cover"
                     />
                 ) : (
                     <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-lg text-indigo-600">
-                        {(friend.name || friend.username || '?').charAt(0).toUpperCase()}
+                        {(friend.fullName || friend.username || '?').charAt(0).toUpperCase()}
                     </div>
                 )}
                 {friend.online && (
@@ -70,7 +70,7 @@ const ConversationItem: React.FC<Conversation> = ({
             <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center justify-between gap-2 mb-0.5">
                     <h3 className={`text-sm font-semibold truncate ${isSelected ? "text-gray-900" : "text-gray-800"}`}>
-                        {friend.name || friend.username}
+                        {friend.fullName || friend.username}
                     </h3>
                     <span className={`text-[11px] whitespace-nowrap shrink-0 ${isSelected ? "text-blue-500 font-medium" : "text-gray-400"}`}>
                         {displayTime}

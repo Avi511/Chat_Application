@@ -12,12 +12,9 @@ export interface MessageProps {
 }
 
 const MessageItem: React.FC<MessageProps> = ({
-    _id,
-    messageId,
     sender,
     senderId,
     content,
-    read,
     createdAt,
     timestamp
 }) => {

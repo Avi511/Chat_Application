@@ -34,7 +34,7 @@ const LoginForm = ({ navigate }: LoginFormProps) => {
         try {
             await login(data);
             toast.success("Logged in successfully!");
-            navigate("/chat");
+            navigate("/");
         } catch (error: any) {
             toast.error(error.message || "Failed to login");
         }

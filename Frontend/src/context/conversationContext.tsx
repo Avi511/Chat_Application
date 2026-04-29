@@ -61,7 +61,7 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
     const [isLoading, setIsLoading] = useState(false);
     const [isError, setIsError] = useState(false);
     const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
-    const { user, isAuthenticated } = useAuthStore();
+    const { isAuthenticated } = useAuthStore();
     const { socket, onlineUsers } = useSocket();
 
     const prevOnlineUsers = useRef<string[]>(onlineUsers);
@@ -90,9 +90,9 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
             const newlyOnline = onlineUsers.filter(id => !prevOnlineUsers.current.includes(id));
 
             newlyOnline.forEach(id => {
-                const friendConv = conversationsRef.current.find(c => c.friend._id === id);
+                const friendConv = conversationsRef.current.find(c => c.friend.id === id);
                 if (friendConv) {
-                    toast.info(`${friendConv.friend.name || friendConv.friend.username} is online`, {
+                    toast.info(`${friendConv.friend.fullName || friendConv.friend.username} is online`, {
                         id: `online_${id}`
                     });
                 }
@@ -201,10 +201,10 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
     useEffect(() => {
         if (socket && activeConversationId) {
             const activeConv = conversations.find(
-                c => c.conversationId === activeConversationId || c.friend._id === activeConversationId
+                c => c.conversationId === activeConversationId || c.friend.id === activeConversationId
             );
             if (activeConv) {
-                socket.emit("newConversation", { friendId: activeConv.friend._id });
+                socket.emit("newConversation", { friendId: activeConv.friend.id });
             }
         }
     }, [socket, activeConversationId, conversations]);
@@ -214,7 +214,7 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
             ...conv,
             friend: {
                 ...conv.friend,
-                online: onlineUsers.includes(conv.friend._id)
+                online: onlineUsers.includes(conv.friend.id)
             }
         }));
     }, [conversations, onlineUsers]);
@@ -231,7 +231,7 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
         if (searchTerm) {
             const lowerTerm = searchTerm.toLowerCase();
             filtered = filtered.filter(conv =>
-                conv.friend.name.toLowerCase().includes(lowerTerm) ||
+                conv.friend.fullName.toLowerCase().includes(lowerTerm) ||
                 conv.friend.username.toLowerCase().includes(lowerTerm)
             );
         }

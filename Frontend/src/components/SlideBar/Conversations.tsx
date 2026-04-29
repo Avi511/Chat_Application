@@ -7,8 +7,6 @@ const Conversations = () => {
         filteredConversations,
         isLoading,
         isError,
-        activeConversationId,
-        setActiveConversationId
     } = useConversationContext();
 
     if (isLoading) {

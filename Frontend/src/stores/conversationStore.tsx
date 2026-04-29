@@ -9,9 +9,9 @@ interface Conversation {
     } | null;
     unreadCounts: Record<string, number>;
     friend: {
-        _id: string;
+        id: string;
         username: string;
-        name: string;
+        fullName: string;
         avatar?: string;
         connectCode: string;
         online: boolean;
