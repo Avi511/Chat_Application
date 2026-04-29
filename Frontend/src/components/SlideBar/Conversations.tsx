@@ -50,9 +50,7 @@ const Conversations = () => {
             {filteredConversations.map((conv) => (
                 <ConversationItem
                     key={conv.conversationId}
-                    conversation={conv}
-                    isActive={activeConversationId === conv.conversationId}
-                    onClick={setActiveConversationId}
+                    {...conv}
                 />
             ))}
         </div>
