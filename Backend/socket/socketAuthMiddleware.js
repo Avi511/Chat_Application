@@ -22,6 +22,7 @@ export const socketAuthMiddleware = async (socket, next) => {
             return next(new Error("User not found"));
         }
         socket.userId = user._id.toString();
+        socket.user = user;
         next();
     } catch (error) {
         console.error("Socket auth middleware error:", error);
