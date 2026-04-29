@@ -11,8 +11,8 @@ const Conversations = () => {
 
     if (isLoading) {
         return (
-            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
-                <Loader2 className="w-8 h-8 animate-spin text-[#00a8ff]" />
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-400">
+                <Loader2 className="w-8 h-8 animate-spin text-cyan-400" />
                 <p className="text-sm font-medium">Loading conversations...</p>
             </div>
         );
@@ -35,7 +35,7 @@ const Conversations = () => {
 
     if (filteredConversations.length === 0) {
         return (
-            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-gray-400">
+            <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-400">
                 <p className="text-sm font-medium">No conversations found</p>
             </div>
         );

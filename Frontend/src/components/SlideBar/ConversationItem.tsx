@@ -46,8 +46,8 @@ const ConversationItem: React.FC<Conversation> = ({
             }}
             className={`w-full flex items-center gap-3 p-3 transition-colors text-left ${
                 isSelected 
-                    ? "bg-[#e5f5ff]" 
-                    : "bg-white hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                    ? "bg-cyan-500/20 border-l-4 border-cyan-400" 
+                    : "bg-transparent hover:bg-white/5 border-b border-white/5 last:border-b-0 border-l-4 border-transparent"
             }`}
         >
             <div className="relative shrink-0">
@@ -58,7 +58,7 @@ const ConversationItem: React.FC<Conversation> = ({
                         className="w-12 h-12 rounded-full object-cover"
                     />
                 ) : (
-                    <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center font-bold text-lg text-indigo-600">
+                    <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center font-bold text-lg text-cyan-400 border border-white/10">
                         {(friend.fullName || friend.username || '?').charAt(0).toUpperCase()}
                     </div>
                 )}
@@ -69,20 +69,20 @@ const ConversationItem: React.FC<Conversation> = ({
 
             <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center justify-between gap-2 mb-0.5">
-                    <h3 className={`text-sm font-semibold truncate ${isSelected ? "text-gray-900" : "text-gray-800"}`}>
+                    <h3 className={`text-sm font-semibold truncate ${isSelected ? "text-white" : "text-slate-200"}`}>
                         {friend.fullName || friend.username}
                     </h3>
-                    <span className={`text-[11px] whitespace-nowrap shrink-0 ${isSelected ? "text-blue-500 font-medium" : "text-gray-400"}`}>
+                    <span className={`text-[11px] whitespace-nowrap shrink-0 ${isSelected ? "text-cyan-400 font-medium" : "text-slate-500"}`}>
                         {displayTime}
                     </span>
                 </div>
 
                 <div className="flex items-center justify-between gap-2 mt-0.5">
-                    <p className={`text-[13px] truncate ${isSelected ? "text-gray-700" : "text-gray-500"}`}>
+                    <p className={`text-[13px] truncate ${isSelected ? "text-slate-300" : "text-slate-400"}`}>
                         {lastMessage?.content || "Start a conversation..."}
                     </p>
                     {totalUnread > 0 && (
-                        <div className="shrink-0 bg-[#00a8ff] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center">
+                        <div className="shrink-0 bg-cyan-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center shadow-[0_0_10px_rgba(34,211,238,0.5)]">
                             {totalUnread > 99 ? '99+' : totalUnread}
                         </div>
                     )}

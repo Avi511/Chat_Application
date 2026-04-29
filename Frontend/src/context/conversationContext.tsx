@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { conversationService } from "../services/conversationService";
 import { useAuthStore } from "../stores/authStore";
 import { useSocket } from "./SocketContext";
+import { useConversationStore } from "../stores/conversationStore";
 export type Message = {
     messageId: string;
     senderId: string;
@@ -238,6 +239,10 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
 
         setFilteredConversations(filtered);
     }, [searchTerm, searchType, conversations]);
+
+    useEffect(() => {
+        useConversationStore.setState({ conversations: conversationsWithStatus });
+    }, [conversationsWithStatus]);
 
     return (
         <ConversationContext.Provider value={{

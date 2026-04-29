@@ -29,7 +29,7 @@ const Auth = () => {
                                 Next Gen Messaging
                             </p>
                             <h1 className="text-3xl sm:text-4xl font-bold text-white">
-                                Zentalk
+                                Chat Pad
                             </h1>
                         </div>
                     </div>
@@ -80,7 +80,7 @@ const Auth = () => {
                         </p>
 
                         <h2 className="text-3xl font-bold text-white">
-                            {isLogin ? "Welcome to Zentalk" : "Join Zentalk"}
+                            {isLogin ? "Welcome to Chat Pad" : "Join Chat Pad"}
                         </h2>
 
                         <p className="text-slate-400 mt-3 text-sm sm:text-base">
