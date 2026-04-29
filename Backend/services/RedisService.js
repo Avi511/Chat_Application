@@ -3,22 +3,24 @@ import { createClient } from "redis";
 class RedisService {
     constructor() {
         this.client = null;
+        this.memoryStore = new Map();
     }
     async initialize() {
         if (this.client) return;
         try {
             this.client = createClient({
-                url: process.env.REDIS_URL
+                url: process.env.REDIS_URL,
+                socket: { reconnectStrategy: false }
             });
 
             this.client.on("error", (error) => {
-                console.error("Redis Client Error", error);
-            })
+            });
 
             await this.client.connect();
             console.log("Redis Client Connected");
         } catch (error) {
-            console.error("Redis Client Error", error);
+            console.log("Failed to connect to Redis. Using in-memory fallback for local dev.");
+            this.client = null;
         }
     }
 
@@ -33,10 +35,7 @@ class RedisService {
 
     async setSession(userId, socketId, expiresIn = 86400) {
         try {
-            // Set user socket ID
             await this.client.set(`user:${userId}`, socketId);
-
-            // Create an expiry key to clean up disconnected sockets
             await this.client.set(`user:expiry:${userId}`, socketId);
             await this.client.expire(`user:expiry:${userId}`, expiresIn);
         } catch (error) {
@@ -55,7 +54,6 @@ class RedisService {
 
     async deleteSession(userId, socketId) {
         try {
-            // Delete both the session and expiry keys to clean up
             await this.client.del(`user:${userId}`);
             await this.client.del(`user:expiry:${userId}`);
         } catch (error) {
@@ -75,8 +73,6 @@ class RedisService {
 
     async cleanupExpiredSessions() {
         try {
-            // This is a simplified cleanup. In production, you might want to iterate through users
-            // or use a more robust pattern.
             const allUsers = await this.client.keys("user:expiry:*ty:*");
             const now = Date.now();
 
@@ -102,28 +98,42 @@ class RedisService {
     }
 
     async addUserSession(userId, socketId) {
+        if (!this.client) {
+            if (!this.memoryStore.has(userId)) this.memoryStore.set(userId, new Set());
+            this.memoryStore.get(userId).add(socketId);
+            return;
+        }
         await this._safe(async () => {
             const key = `user:${userId}`;
-            await this.client.sAdd(key, socketId); // Use sAdd for Sets to support multiple tabs
+            await this.client.sAdd(key, socketId);
             await this.client.set(`user:expiry:${userId}`, "active");
             await this.client.expire(`user:expiry:${userId}`, 86400);
         })
     }
 
     async removeUserSession(userId, socketId) {
+        if (!this.client) {
+            if (this.memoryStore.has(userId)) {
+                this.memoryStore.get(userId).delete(socketId);
+                if (this.memoryStore.get(userId).size === 0) this.memoryStore.delete(userId);
+            }
+            return;
+        }
         await this._safe(async () => {
             const key = `user:${userId}`;
-            await this.client.sRem(key, socketId); // Remove specific socket tab
+            await this.client.sRem(key, socketId);
 
-            const remainingSocketIds = await this.client.sCard(key); // Count remaining sockets
+            const remainingSocketIds = await this.client.sCard(key);
             if (remainingSocketIds === 0) {
                 await this.client.del(`user:expiry:${userId}`);
             }
         })
     }
 
-    // Overriding the previous isUserOnline to correctly use Set logic
     async isUserOnline(userId) {
+        if (!this.client) {
+            return this.memoryStore.has(userId) && this.memoryStore.get(userId).size > 0;
+        }
         return this._safe(async () => {
             const count = await this.client.sCard(`user:${userId}`);
             return count > 0;
@@ -131,6 +141,10 @@ class RedisService {
     }
 
     async removeAllUserSessions(userId) {
+        if (!this.client) {
+            this.memoryStore.delete(userId);
+            return;
+        }
         await this._safe(async () => {
             await this.client.del(`user:${userId}`);
             await this.client.del(`user:expiry:${userId}`);

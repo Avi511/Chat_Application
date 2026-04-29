@@ -89,7 +89,7 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
     useEffect(() => {
         if (isReadyForToasts.current) {
             const newlyOnline = onlineUsers.filter(id => !prevOnlineUsers.current.includes(id));
-            
+
             newlyOnline.forEach(id => {
                 const friendConv = conversationsRef.current.find(c => c.friend._id === id);
                 if (friendConv) {
@@ -125,6 +125,51 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
             fetchConversations();
         }
     }, [isAuthenticated]);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleConversationAccept = (data: any) => {
+            const newConversation: Conversation = {
+                conversationId: data.conversationId,
+                lastMessage: data.lastMessage || null,
+                unreadCounts: data.unreadCounts || {},
+                friendshipId: data.friendshipId || "",
+                friend: {
+                    _id: data.friend.id || data.friend._id,
+                    username: data.friend.username,
+                    name: data.friend.name || data.friend.fullName,
+                    avatar: data.friend.avatar,
+                    connectCode: data.friend.connectCode,
+                    online: data.friend.online,
+                    lastSeen: data.friend.lastSeen || new Date().toISOString(),
+                }
+            };
+
+            const exists = conversationsRef.current.some(c => c.conversationId === newConversation.conversationId);
+            if (exists) return; // Prevent duplicate events or re-renders from adding it twice
+
+            setConversations(prev => [newConversation, ...prev]);
+
+            toast.success(`You are now connected with ${newConversation.friend.name}!`, {
+                id: `connected_${newConversation.conversationId}`
+            });
+        };
+
+        const handleConversationError = (data: any) => {
+            toast.error(data.error || "Failed to add conversation", {
+                id: "conversation_error"
+            });
+        };
+
+        socket.on('conversation:accept', handleConversationAccept);
+        socket.on('conversation:request:error', handleConversationError);
+
+        return () => {
+            socket.off('conversation:accept', handleConversationAccept);
+            socket.off('conversation:request:error', handleConversationError);
+        };
+    }, [socket]);
 
     useEffect(() => {
         if (socket && activeConversationId) {

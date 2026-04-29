@@ -15,8 +15,8 @@ class ConversationController {
             }
             const existFriendship = await Friendship.findOne({
                 $or: [
-                    { participants: [userId, friend._id] },
-                    { participants: [friend._id, userId] }
+                    { requester: userId, recipient: friend._id },
+                    { requester: friend._id, recipient: userId }
                 ]
             });
             if (existFriendship) {

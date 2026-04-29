@@ -3,7 +3,7 @@ import User from "../models/User.js"
 import Conversation from "../models/Conversation.js"
 import Message from "../models/Message.js"
 
-import { getChatRoom } from "./helpers.js"
+import { getChatRoom } from "./helper.js"
 import RedisService from "../services/RedisService.js"
 
 
@@ -72,6 +72,7 @@ export const conversationRequest = async (io, socket, data) => {
         const friendship = await Friendship.create({
             requester: userId,
             recipient: friend._id,
+            status: "accepted",
         })
 
         const conversation = await Conversation.create({
@@ -83,6 +84,7 @@ export const conversationRequest = async (io, socket, data) => {
         io.in(friend._id.toString()).socketsJoin(roomName);
         const conversationData = {
             conversationId: conversation._id.toString(),
+            friendshipId: friendship._id.toString(),
             lastMessage: null,
             unreadCounts: {
                 [userId.toString()]: 0,
@@ -94,7 +96,7 @@ export const conversationRequest = async (io, socket, data) => {
             ...conversationData,
             friend: {
                 id: friend.id,
-                fullName: friend.fullName,
+                name: friend.name,
                 username: friend.username,
                 connectCode: friend.connectCode,
                 online: await RedisService.isUserOnline(friend._id.toString()),
@@ -105,7 +107,7 @@ export const conversationRequest = async (io, socket, data) => {
             ...conversationData,
             friend: {
                 id: user.id,
-                fullName: user.fullName,
+                name: user.name,
                 username: user.username,
                 connectCode: user.connectCode,
                 online: await RedisService.isUserOnline(user._id.toString()),
