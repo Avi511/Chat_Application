@@ -26,27 +26,27 @@ const Modal: React.FC<ModalProps> = ({
     };
 
     return <>
-        <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex justify-center items-center z-50">
             <div
                 className={`
-                    bg-white rounded-2xl shadow-lg w-full ${sizeClass[size]} p-6    
+                    bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full ${sizeClass[size]} p-6    
                 `}
             >
-                <div className="flex justify-between items-center mb-4">
-                    {title && <h2 className="text-xl text-black font-semibold">{title}</h2>}
+                <div className="flex justify-between items-center mb-5">
+                    {title && <h2 className="text-xl text-white font-bold tracking-wide">{title}</h2>}
                     <button
                         type="button"
                         onClick={onClose}
-                        className="text-gray-500 hover:text-gray-700 text-lg font-bold cursor-pointer"
+                        className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white transition cursor-pointer"
                     >
-                        <X />
+                        <X size={18} />
                     </button>
                 </div>
 
-                <div className="mb-4">
+                <div className="mb-2">
                     {children}
                 </div>
-                {footer && <div className="mt-4">{footer}</div>}
+                {footer && <div className="mt-6 pt-4 border-t border-white/10">{footer}</div>}
             </div>
         </div>
     </>

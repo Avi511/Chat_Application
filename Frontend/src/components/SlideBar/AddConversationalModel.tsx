@@ -72,19 +72,20 @@ const AddConversationModal: React.FC<AddConversationModalProps> = ({
             title="Add Conversation"
         >
             <form onSubmit={handleSubmit(onSubmit)}>
-                <label htmlFor="connectCode" className="block text-gray-700 mb-2 text-sm">Connect ID</label>
-                <div className="relative mb-2">
-                    <Wifi className="absolute inset-y-0 left-3 size-5 text-gray-400 top-1/2 -translate-y-1/2" />
+                <label htmlFor="connectCode" className="block text-slate-300 mb-2 text-sm font-medium">Connect ID</label>
+                <div className="relative mb-4">
+                    <Wifi className="absolute inset-y-0 left-3 size-5 text-slate-400 top-1/2 -translate-y-1/2" />
                     <input
                         {...register('connectCode')}
-                        className="text-black text-sm w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500"
+                        placeholder="Enter 6-digit ID"
+                        className="text-white bg-slate-800/50 w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors placeholder:text-slate-500"
                     />
                 </div>
-                {errors.connectCode && <p className="text-red-500 text-sm">{errors.connectCode.message}</p>}
+                {errors.connectCode && <p className="text-red-400 text-xs mt-1 mb-3">{errors.connectCode.message}</p>}
                 <button
                     type="submit"
                     disabled={isFetching}
-                    className="w-full flex justify-center items-center bg-sky-500 text-white py-2 rounded-lg hover:bg-blue-600 transition cursor-pointer mt-4"
+                    className="w-full flex justify-center items-center bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-3 rounded-xl hover:opacity-90 transition-all cursor-pointer font-medium shadow-[0_0_20px_rgba(34,211,238,0.2)] hover:shadow-[0_0_25px_rgba(34,211,238,0.4)]"
                 >
                     {isFetching ? <Loader2 className="animate-spin size-5" /> : "Connect"}
                 </button>
