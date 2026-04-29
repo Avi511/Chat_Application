@@ -6,10 +6,12 @@ import { ConversationProvider } from "../../context/ConversationContext";
 
 const SideBar = () => {
     return (
-        <aside className="w-full md:w-80 h-screen bg-slate-950/95 border-r border-white/5 text-white flex flex-col shadow-2xl z-20">
-            <Header />
+        <aside className="w-full md:w-80 h-screen bg-white border-r border-gray-200 flex flex-col z-20">
             <ConversationProvider>
-                <SearchBar />
+                <div className="bg-[#00a8ff]">
+                    <Header />
+                    <SearchBar />
+                </div>
                 <Conversations />
             </ConversationProvider>
             <UserProfile />

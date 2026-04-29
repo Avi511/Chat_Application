@@ -59,22 +59,22 @@ const MessageList: React.FC = () => {
     )
 
     if (isLoading) {
-        return <div className="relative flex-1 h-full flex items-center justify-center">
-            <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
+        return <div className="relative flex-1 h-full flex items-center justify-center bg-white">
+            <Loader2 className="w-8 h-8 animate-spin text-[#00a8ff]" />
         </div>
     }
 
-    return <div ref={containerRef} className="flex-1 bg-transparent overflow-y-auto p-4 pb-10 scrollbar-thin scrollbar-thumb-white/5 hover:scrollbar-thumb-white/10">
+    return <div ref={containerRef} className="flex-1 bg-white overflow-y-auto p-4 pb-10">
         {hasNextPage && <div className="flex justify-center mb-6 mt-2">
             <button
                 type="button"
-                className="px-4 py-1.5 text-xs font-medium bg-slate-800/60 text-slate-300 rounded-full border border-slate-700/50 hover:bg-slate-700/60 hover:text-white transition-all cursor-pointer backdrop-blur-sm shadow-sm flex items-center space-x-2"
+                className="px-4 py-1.5 text-xs font-medium bg-gray-100 text-gray-500 rounded-full hover:bg-gray-200 transition-all cursor-pointer flex items-center space-x-2"
                 onClick={handleLoadMore}
                 disabled={isFetchingNextPage}
             >
                 {isFetchingNextPage ? (
                     <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-cyan-500" />
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-[#00a8ff]" />
                         <span>Loading older messages...</span>
                     </>
                 ) : (

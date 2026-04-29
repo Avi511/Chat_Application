@@ -49,9 +49,9 @@ const MessageItem: React.FC<MessageProps> = ({
 
     if (userIsSender) {
         return <div className="flex justify-end mb-4">
-            <div className="bg-cyan-500/90 backdrop-blur-sm text-white p-3 px-4 max-w-xs lg:max-w-md rounded-2xl rounded-tr-sm shadow-[0_4px_15px_rgba(6,182,212,0.2)] border border-cyan-400/20">
-                <p className="text-sm leading-relaxed">{content}</p>
-                <span className="text-[10px] flex justify-end text-cyan-100/80 mt-1 font-medium tracking-wide">{displayTime}</span>
+            <div className="bg-[#00a8ff] text-white p-3 px-4 max-w-xs lg:max-w-md rounded-2xl rounded-br-sm shadow-sm">
+                <p className="text-[15px] leading-relaxed">{content}</p>
+                <span className="text-[11px] flex justify-end text-blue-100 mt-1">{displayTime}</span>
             </div>
         </div>
     }
@@ -60,11 +60,11 @@ const MessageItem: React.FC<MessageProps> = ({
         <img
             src="https://avatar.iran.liara.run/public"
             alt={sender?.username || "User"}
-            className="size-7 rounded-full object-cover mr-2 mb-1 shadow-sm border border-slate-700/50"
+            className="w-8 h-8 rounded-full object-cover mr-2 mb-1"
         />
-        <div className="bg-slate-800/80 backdrop-blur-sm p-3 px-4 max-w-xs lg:max-w-md rounded-2xl rounded-tl-sm shadow-sm border border-slate-700/50">
-            <p className="text-sm text-slate-200 leading-relaxed">{content}</p>
-            <span className="text-[10px] text-slate-500 flex items-center gap-1 mt-1 font-medium tracking-wide">{displayTime}</span>
+        <div className="bg-[#f0f2f5] p-3 px-4 max-w-xs lg:max-w-md rounded-2xl rounded-bl-sm shadow-sm">
+            <p className="text-[15px] text-gray-800 leading-relaxed">{content}</p>
+            <span className="text-[11px] text-gray-500 flex items-center gap-1 mt-1">{displayTime}</span>
         </div>
     </div>
 }

@@ -1,6 +1,5 @@
 
-export const getChatRoom = async (userId1, userId2) => {
-
+export const getChatRoom = (userId1, userId2) => {
     const sortedUsers = [userId1.toString(), userId2.toString()].sort();
     return 'chatRoom' + sortedUsers[0] + sortedUsers[1];
 }

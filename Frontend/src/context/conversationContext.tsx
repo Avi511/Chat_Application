@@ -149,7 +149,7 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
 
             setConversations(prev => [newConversation, ...prev]);
 
-            toast.success(`You are now connected with ${newConversation.friend.name}!`, {
+            toast.success(`You are now connected with ${newConversation.friend.fullName}!`, {
                 id: `connected_${newConversation.conversationId}`
             });
         };
@@ -160,12 +160,41 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
             });
         };
 
+        const handleConversationUpdate = (data: any) => {
+            setConversations(prev => prev.map(conv => {
+                if (conv.conversationId === data.conversationId) {
+                    return {
+                        ...conv,
+                        lastMessage: data.lastMessage,
+                        unreadCounts: data.unreadCounts || conv.unreadCounts
+                    };
+                }
+                return conv;
+            }));
+        };
+
+        const handleUnreadCountsUpdate = (data: any) => {
+            setConversations(prev => prev.map(conv => {
+                if (conv.conversationId === data.conversationId) {
+                    return {
+                        ...conv,
+                        unreadCounts: data.unreadCounts
+                    };
+                }
+                return conv;
+            }));
+        };
+
         socket.on('conversation:accept', handleConversationAccept);
         socket.on('conversation:request:error', handleConversationError);
+        socket.on('conversation:update-conversation', handleConversationUpdate);
+        socket.on('conversation:update-unread-counts', handleUnreadCountsUpdate);
 
         return () => {
             socket.off('conversation:accept', handleConversationAccept);
             socket.off('conversation:request:error', handleConversationError);
+            socket.off('conversation:update-conversation', handleConversationUpdate);
+            socket.off('conversation:update-unread-counts', handleUnreadCountsUpdate);
         };
     }, [socket]);
 

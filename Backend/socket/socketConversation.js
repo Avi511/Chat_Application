@@ -186,15 +186,13 @@ export const conversationSendMessage = async (io, socket, data) => {
         }
 
         const message = new Message({
-            conversation: conversation.id,
+            conversationId: conversation.id,
             sender: userId,
             content,
         })
         await message.save();
 
-        const currentUnreadCount = conversation.unreadCounts.get(friendId) || 0;
-        conversation.unreadCounts.set(friendId, currentUnreadCount + 1);
-        await conversation.save();
+        // The Message.js post-save hook automatically updates the conversation's unreadCounts and lastMessagePreview
 
         const messageData = {
             _id: message.id,

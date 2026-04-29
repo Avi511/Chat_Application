@@ -62,12 +62,12 @@ const MessageInput: React.FC = () => {
     };
 
 
-    return <div className="p-4 border-t border-white/5 bg-slate-900/40 backdrop-blur-md z-10">
+    return <div className="p-4 border-t border-gray-100 bg-white z-10">
         <div className="flex items-center max-w-4xl mx-auto">
             <div className="flex-1 relative">
                 <textarea
                     placeholder="Type a message..."
-                    className="w-full text-sm bg-slate-800/60 text-slate-100 placeholder:text-slate-500 rounded-full py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 border border-slate-700/50 resize-none block overflow-hidden leading-[1.2rem] h-[44px]"
+                    className="w-full text-[15px] bg-[#f0f2f5] text-black placeholder:text-gray-500 rounded-full py-3.5 px-5 focus:outline-none resize-none block overflow-hidden leading-[1.2rem] h-[44px]"
                     value={message}
                     onChange={(e) => handleOnChange(e)}
                     onKeyDown={(e) => {
@@ -84,7 +84,7 @@ const MessageInput: React.FC = () => {
                     onClick={handleSendMessage}
                     type="button"
                     disabled={!message.trim()}
-                    className="bg-cyan-500 text-white rounded-full size-11 flex items-center justify-center hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
+                    className="bg-[#00a8ff] text-white rounded-full size-11 flex items-center justify-center hover:bg-[#0097e6] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-colors shadow-sm"
                 >
                     <Send className="size-[18px] ml-0.5" />
                 </button>

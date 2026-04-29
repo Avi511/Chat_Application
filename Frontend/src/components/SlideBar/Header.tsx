@@ -6,30 +6,24 @@ const Header: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="flex items-center justify-between px-6 py-5 border-b border-white/5 bg-transparent">
-            <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-[0_0_25px_rgba(34,211,238,0.25)]">
-                    <span className="text-white text-lg font-bold">Z</span>
-                </div>
-                <div>
-                    <h1 className="text-lg text-white font-bold tracking-wide">Zentalk</h1>
-                    <p className="text-xs text-slate-400">Messaging Platform</p>
-                </div>
+        <div className="flex items-center justify-between px-4 py-4">
+            <div>
+                <h1 className="text-xl text-white font-bold tracking-wide">Messages</h1>
             </div>
 
             <div className="flex items-center gap-2">
                 <button 
                     onClick={() => setIsOpen(true)} 
-                    className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer"
+                    className="p-2 rounded-full hover:bg-white/20 transition cursor-pointer"
                     title="Add Contact"
                 >
-                    <Contact size={18} className="text-slate-300" />
+                    <Contact size={18} className="text-white" />
                 </button>
                 <button 
-                    className="p-2 rounded-xl bg-white/5 hover:bg-white/10 transition cursor-pointer"
+                    className="p-2 rounded-full hover:bg-white/20 transition cursor-pointer"
                     title="Settings"
                 >
-                    <Settings size={18} className="text-slate-300" />
+                    <Settings size={18} className="text-white" />
                 </button>
             </div>
 
