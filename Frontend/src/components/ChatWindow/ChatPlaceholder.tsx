@@ -1,10 +1,13 @@
 import { MessageCircle } from "lucide-react";
 
 const ChatPlaceholder: React.FC = () => {
-    return <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-center p-8 text-gray-500">
-        <MessageCircle className="size-16 mb-4 opacity-70" />
-        <h2 className="text-lg font-semibold">Welcome to Chatty</h2>
-        <p className="text-sm mt-2">Select a friend from your list to start chatting</p>
+    return <div className="flex-1 bg-transparent flex flex-col items-center justify-center text-center p-8 text-slate-500 h-full">
+        <div className="relative">
+            <div className="absolute inset-0 bg-cyan-500/20 blur-2xl rounded-full" />
+            <MessageCircle className="size-16 mb-6 text-cyan-400/80 relative z-10" strokeWidth={1.5} />
+        </div>
+        <h2 className="text-xl font-semibold text-slate-300 tracking-wide">Welcome to Zentalk</h2>
+        <p className="text-sm mt-3 max-w-xs text-slate-500 leading-relaxed">Select a conversation from the sidebar to start messaging.</p>
     </div>
 }
 

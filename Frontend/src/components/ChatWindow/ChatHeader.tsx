@@ -8,13 +8,13 @@ const ChatHeader: React.FC = () => {
 
     if (!selectedConversation) return null;
 
-    return <div className="p-4 border-b border-gray-800 bg-slate-900/50 backdrop-blur-md flex items-center justify-between">
+    return <div className="p-4 border-b border-white/5 bg-slate-900/40 backdrop-blur-md flex items-center justify-between z-10">
         <div className="flex items-center space-x-3">
             <div className="relative">
                 <img 
                     src={selectedConversation.friend.avatar || "https://avatar.iran.liara.run/public"} 
                     alt="User image" 
-                    className="size-10 rounded-full object-cover border border-slate-700" 
+                    className="size-10 rounded-full object-cover border border-slate-700/50 shadow-sm" 
                 />
                 {selectedConversation.friend.online && (
                     <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-slate-900 rounded-full flex items-center justify-center">
@@ -23,18 +23,18 @@ const ChatHeader: React.FC = () => {
                 )}
             </div>
             <div>
-                <h2 className="font-semibold text-slate-100">{selectedConversation.friend.name || selectedConversation.friend.username}</h2>
-                <p className={`${selectedConversation.friend.online ? 'text-xs text-cyan-400' : 'text-xs text-slate-400'}`}>
+                <h2 className="font-semibold text-slate-100 tracking-wide">{selectedConversation.friend.fullName || selectedConversation.friend.username}</h2>
+                <p className={`${selectedConversation.friend.online ? 'text-xs font-medium text-cyan-400' : 'text-xs text-slate-500'}`}>
                     {selectedConversation.friend.online ? 'Online' : 'Offline'}
                 </p>
             </div>
         </div>
         <div className="flex space-x-4">
-            <button className="text-slate-400 hover:text-cyan-400 transition-colors cursor-pointer">
-                <EllipsisVertical className="size-[18px]" />
+            <button className="text-slate-400 hover:text-cyan-400 transition-colors cursor-pointer bg-slate-800/50 p-2 rounded-full hover:bg-slate-800">
+                <EllipsisVertical className="size-4" />
             </button>
-            <button onClick={() => setActiveConversation(null)} className="sm:hidden text-slate-400 hover:text-rose-400 transition-colors cursor-pointer">
-                <X className="size-5" />
+            <button onClick={() => setActiveConversation(null)} className="sm:hidden text-slate-400 hover:text-rose-400 transition-colors cursor-pointer bg-slate-800/50 p-2 rounded-full hover:bg-slate-800">
+                <X className="size-4" />
             </button>
         </div>
     </div>

@@ -18,15 +18,14 @@ export type Conversation = {
     } | null;
     unreadCounts: Record<string, number>;
     friend: {
-        _id: string;
+        id: string;
         username: string;
-        name: string;
+        fullName: string;
         avatar?: string;
         connectCode: string;
         online: boolean;
         lastSeen: string;
     };
-    friendshipId: string;
 }
 
 type ConversationContextType = {
@@ -134,11 +133,10 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
                 conversationId: data.conversationId,
                 lastMessage: data.lastMessage || null,
                 unreadCounts: data.unreadCounts || {},
-                friendshipId: data.friendshipId || "",
                 friend: {
-                    _id: data.friend.id || data.friend._id,
+                    id: data.friend.id || data.friend._id,
                     username: data.friend.username,
-                    name: data.friend.name || data.friend.fullName,
+                    fullName: data.friend.fullName || data.friend.name,
                     avatar: data.friend.avatar,
                     connectCode: data.friend.connectCode,
                     online: data.friend.online,

@@ -1,140 +1,116 @@
-import Conversation from "../models/Conversation.js";
-import Message from "../models/Message.js";
-import User from "../models/User.js";
-import Friendship from "../models/Friendship.js";
-import redisService from "../services/RedisService.js";
+import Conversation from "../models/Conversation.js"
+import Friendship from "../models/Friendship.js"
+import User from "../models/User.js"
+import RedisService from "../services/RedisService.js";
 
 class ConversationController {
     static async checkConnectCode(req, res) {
         try {
-            const userId = req.user.id;
+            const userId = req.user._id;
             const { connectCode } = req.query;
+
             const friend = await User.findOne({ connectCode });
-            if (!friend || friend.id === userId) {
-                return res.status(404).json({ message: "Invalid connect code" });
+
+            if (!friend || friend._id.toString() === userId.toString()) {
+                return res.status(400).json({ message: "Invalid connect ID" });
             }
-            const existFriendship = await Friendship.findOne({
+
+            const existingFriendship = await Friendship.findOne({
                 $or: [
                     { requester: userId, recipient: friend._id },
-                    { requester: friend._id, recipient: userId }
-                ]
-            });
-            if (existFriendship) {
-                return res.status(400).json({ message: "You are already friends" });
-            }
-            res.json({
-                success: true,
-                message: `You have a new friend ${friend.username}`,
+                    { requester: friend._id, recipient: userId },
+                ],
             })
 
+            if (existingFriendship) {
+                return res.status(400).json({ message: "Friendship already exists" })
+            }
+
+            res.json({
+                success: true,
+                message: "Connect ID is valid"
+            });
+
         } catch (error) {
-            console.error("Error checking connect code:", error);
-            return res.status(500).json({ message: "Error checking connect code" });
+            console.error("Error checking connect code", error);
+            res.status(500).json({ message: 'Internal server error' })
         }
     }
 
     static async getConversations(req, res) {
         try {
-            const userId = req.user.id;
+            const userId = req.user._id;
+
+            // get friendships for this user
             const friendships = await Friendship.find({
                 $or: [
                     { requester: userId },
-                    { recipient: userId }
+                    { recipient: userId },
                 ],
-                status: "accepted"
             }).populate([
-                {
-                    path: "requester",
-                    select: "_id username name avatar"
-                },
-                {
-                    path: "recipient",
-                    select: "_id username name avatar"
-                }
+                { path: 'requester', select: 'id fullName username connectCode' },
+                { path: 'recipient', select: 'id fullName username connectCode' },
             ]).lean();
 
-            if (friendships.length === 0) {
-                return res.status(200).json([]);
+            if (!friendships.length) {
+                return res.json({ data: [] });
             }
 
-            const friendIds = friendships.map(friendship => {
-                return friendship.requester._id.toString() === userId ? friendship.recipient._id : friendship.requester._id;
-            })
+            // extract friend ids
+            const friendIds = friendships.map((friend) =>
+                friend.requester._id.toString() === userId.toString() ?
+                    friend.recipient._id.toString() : friend.requester._id.toString()
+            )
 
+            // get conversations
             const conversations = await Conversation.find({
                 participants: {
                     $all: [userId],
                     $in: friendIds,
-                    $size: 2
+                    $size: 2,
                 }
             })
 
-            const conversationMap = new Map();
-            conversations.forEach(conversation => {
+            // create conversations map
+            const conversationsMap = new Map();
+            conversations.forEach((conversation) => {
                 const friendId = conversation.participants.find(p => p.toString() !== userId.toString());
-                if (friendId) {
-                    conversationMap.set(friendId.toString(), conversation);
-                }
+                conversationsMap.set(friendId._id.toString(), conversation);
             })
 
-            const conversationData = (await Promise.all(
-                friendships.map(async (friendship) => {
+            // create conversations response data
+            const conversationsData = await Promise.all([
+                ...friendships.map(async (friendship) => {
                     const isRequester = friendship.requester._id.toString() === userId.toString();
-                    const friendId = isRequester ? friendship.recipient._id : friendship.requester._id;
-                    const conversation = conversationMap.get(friendId.toString());
+                    const friend = isRequester ? friendship.recipient : friendship.requester;
 
-                    if (!conversation) return null;
-
-                    const isOnline = await redisService.isUserOnline(friendId.toString());
+                    const conversation = conversationsMap.get(friend._id.toString());
 
                     return {
-                        conversationId: conversation._id,
+                        conversationId: conversation.id,
                         lastMessage: conversation.lastMessagePreview || null,
                         unreadCounts: {
-                            [friendship._id.toString()]: (conversation.unreadCounts && conversation.unreadCounts.get ? conversation.unreadCounts.get(friendId.toString()) : conversation.unreadCounts[friendId.toString()]) || 0,
+                            [friendship.requester._id.toString()]: conversation.unreadCounts.get(friendship.requester._id.toString()) || 0,
+                            [friendship.recipient._id.toString()]: conversation.unreadCounts.get(friendship.recipient._id.toString()) || 0,
                         },
                         friend: {
-                            _id: friendId,
-                            username: isRequester ? friendship.recipient.username : friendship.requester.username,
-                            name: isRequester ? friendship.recipient.name : friendship.requester.name,
-                            avatar: isRequester ? friendship.recipient.avatar : friendship.requester.avatar,
-                            connectCode: isRequester ? friendship.recipient.connectCode : friendship.requester.connectCode,
-                            online: await redisService.isUserOnline(friendId.toString()),
-                            lastSeen: await redisService.isUserOnline(friendId.toString()) ? "Online" : "Recent activity",
-                        },
-                        friendshipId: friendship._id.toString()
-                    };
+                            id: friend._id.toString(),
+                            username: friend.username,
+                            fullName: friend.fullName,
+                            connectCode: friend.connectCode,
+                            online: await RedisService.isUserOnline(friend._id.toString()),
+                        }
+                    }
                 })
-            )).filter(item => item !== null);
-            res.status(200).json({ success: true, data: conversationData });
+            ])
+
+            res.json({ data: conversationsData });
+
 
         } catch (error) {
-            console.error("Error getting conversations:", error);
-            res.status(500).json({ message: "Error getting conversations" });
-        }
-    }
-    static async getMessages(req, res) {
-        try {
-            const { conversationId } = req.params;
-            const userId = req.user.id;
-
-            const messages = await Message.find({ conversationId })
-                .sort({ createdAt: 1 })
-                .lean();
-
-            // Clear unread counts for this user in this conversation
-            await Conversation.findByIdAndUpdate(conversationId, {
-                $set: {
-                    [`unreadCounts.${userId.toString()}`]: 0
-                }
-            });
-
-            res.status(200).json({ success: true, data: messages });
-        } catch (error) {
-            console.error("Error getting messages:", error);
-            res.status(500).json({ message: "Error getting messages" });
+            console.error("Error fetching conversations", error);
+            res.status(500).json({ message: 'Internal server error' })
         }
     }
 }
-
 export default ConversationController;

@@ -1,11 +1,10 @@
 import express from "express";
 import ConversationController from "../controllers/conversationController.js";
-import { authMiddleware } from "../middlewares/authMiddleware.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
 router.get("/check-connect-code", authMiddleware, ConversationController.checkConnectCode);
 router.get("/", authMiddleware, ConversationController.getConversations);
-router.get("/:conversationId/messages", authMiddleware, ConversationController.getMessages);
 
 export default router;

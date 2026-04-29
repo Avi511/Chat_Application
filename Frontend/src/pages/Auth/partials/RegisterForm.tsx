@@ -8,7 +8,7 @@ import { Mail, Lock, User, Loader2, Eye, EyeOff, ShieldCheck, AtSign } from "luc
 import type { NavigateFunction } from "react-router-dom";
 
 const registerSchema = z.object({
-    name: z.string().min(2, "Name must be at least 2 characters"),
+    fullName: z.string().min(2, "Full name must be at least 2 characters"),
     username: z.string().min(3, "Username must be at least 3 characters").regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
@@ -41,7 +41,7 @@ const RegisterForm = ({ navigate, onSuccess }: RegisterFormProps) => {
     const onSubmit = async (data: RegisterFormValues) => {
         try {
             await registerUser({
-                name: data.name,
+                fullName: data.fullName,
                 username: data.username,
                 email: data.email,
                 password: data.password
@@ -66,17 +66,17 @@ const RegisterForm = ({ navigate, onSuccess }: RegisterFormProps) => {
                             <User size={18} />
                         </div>
                         <input
-                            {...register("name")}
+                            {...register("fullName")}
                             type="text"
                             placeholder="John Doe"
-                            className={`w-full pl-11 pr-4 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.name
+                            className={`w-full pl-11 pr-4 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.fullName
                                 ? "border-red-500/70 focus:ring-red-500/30"
                                 : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
                                 }`}
                         />
                     </div>
-                    {errors.name && (
-                        <p className="mt-2 text-xs text-red-400 pl-1">{errors.name.message}</p>
+                    {errors.fullName && (
+                        <p className="mt-2 text-xs text-red-400 pl-1">{errors.fullName.message}</p>
                     )}
                 </div>
 

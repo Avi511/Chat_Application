@@ -8,7 +8,7 @@ import { Lock, Loader2, Eye, EyeOff, UserCircle } from "lucide-react";
 import type { NavigateFunction } from "react-router-dom";
 
 const loginSchema = z.object({
-    identifier: z.string().min(3, "Username or Email is required"),
+    email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -44,24 +44,24 @@ const LoginForm = ({ navigate }: LoginFormProps) => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">
-                    Username or Email
+                    Email Address
                 </label>
                 <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
                         <UserCircle size={18} />
                     </div>
                     <input
-                        {...register("identifier")}
-                        type="text"
-                        placeholder="username or email"
-                        className={`w-full pl-11 pr-4 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.identifier
+                        {...register("email")}
+                        type="email"
+                        placeholder="you@example.com"
+                        className={`w-full pl-11 pr-4 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.email
                             ? "border-red-500/70 focus:ring-red-500/30"
                             : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
                             }`}
                     />
                 </div>
-                {errors.identifier && (
-                    <p className="mt-2 text-xs text-red-400">{errors.identifier.message}</p>
+                {errors.email && (
+                    <p className="mt-2 text-xs text-red-400">{errors.email.message}</p>
                 )}
             </div>
 

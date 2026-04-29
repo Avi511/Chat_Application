@@ -8,6 +8,7 @@ import http from 'http';
 import { connectDB } from './utils/db.js';
 import authRoutes from './routes/authRoutes.js';
 import conversationRoutes from './routes/conversationRoutes.js';
+import messageRoutes from './routes/messageRoutes.js';
 import { socketAuthMiddleware } from './socket/socketAuthMiddleware.js';
 import redisService from "./services/RedisService.js";
 
@@ -40,6 +41,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/conversations", messageRoutes);
 
 initializeSocket(io);
 

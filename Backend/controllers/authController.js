@@ -1,140 +1,127 @@
-import User from "../models/User.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
+import User from "../models/User.js"
 import generateUniqueConnectCode from "../utils/generateUniqueConnectCode.js";
+
 
 class AuthController {
     static async register(req, res) {
         try {
-            let { name, username, email, password } = req.body;
+            const { fullName, username, email, password } = req.body;
 
-            name = name?.trim();
-            username = username?.trim();
-            email = email?.trim().toLowerCase();
-            password = password?.trim();
-
-            if (!name || !username || !email || !password) {
+            if (!fullName || !username || !email || !password) {
                 return res.status(400).json({ message: "All fields are required" });
             }
 
             if (password.length < 6) {
-                return res.status(400).json({ message: "Password must be at least 6 characters long" });
+                return res.status(400).json({ message: "Password must be at lesat 6 characters long" });
             }
 
             const existingUser = await User.findOne({
-                $or: [{ email }, { username }]
+                $or: [{ username }, { email }]
             });
 
             if (existingUser) {
-                return res.status(400).json({ message: "Email or username already in use" });
+                return res.status(400).json({ message: "User already exists with username or email" });
             }
 
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const connectCode = await generateUniqueConnectCode();
+            // hash password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
 
-            const user = await User.create({
-                name,
+            const user = new User({
                 username,
+                fullName,
                 email,
                 password: hashedPassword,
-                connectCode
+                connectCode: await generateUniqueConnectCode(),
             });
 
-            return res.status(201).json({
-                message: "User registered successfully",
-                user: {
-                    id: user._id,
-                    name: user.name,
-                    username: user.username,
-                    email: user.email,
-                    connectCode: user.connectCode
-                }
-            });
+            await user.save();
+
+            res.status(201).json({ success: true });
+
+
         } catch (error) {
-            console.error("Register error:", error);
-            return res.status(500).json({ message: "Registration error" });
+            console.error("Registration error", error);
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 
     static async login(req, res) {
         try {
-            let { identifier, password } = req.body;
+            const { email, password } = req.body;
 
-            identifier = identifier?.trim();
-            password = password?.trim();
-
-            if (!identifier || !password) {
-                return res.status(400).json({ message: "All fields are required" });
+            if (!email || !password) {
+                return res.status(400).json({ message: "Invalid credentials" });
             }
 
-            const user = await User.findOne({
-                $or: [{ email: identifier.toLowerCase() }, { username: identifier }]
-            });
+            const user = await User.findOne({ email });
 
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                return res.status(400).json({ message: "Invalid credentials" });
             }
 
-            const isPasswordValid = await bcrypt.compare(password, user.password);
-            if (!isPasswordValid) {
-                return res.status(401).json({ message: "Invalid credentials" });
+            const isValidPassword = await bcrypt.compare(password, user.password);
+            if (!isValidPassword) {
+                return res.status(400).json({ message: "Invalid credentials" });
             }
 
-            const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
+            const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+                expiresIn: '7d'
+            })
 
-            res.cookie("token", token, {
-                httpOnly: true,
-                sameSite: "strict",
+            res.cookie("jwt", token, {
                 maxAge: 7 * 24 * 60 * 60 * 1000,
-                secure: process.env.NODE_ENV === "production"
-            });
+                httpOnly: true,
+                sameSite: 'strict',
+                secure: process.env.NODE_ENV !== "development"
+            })
 
-            return res.status(200).json({
-                message: "User logged in successfully",
+            res.status(200).json({
                 user: {
-                    id: user._id,
-                    name: user.name,
+                    id: user.id,
                     username: user.username,
+                    fullName: user.fullName,
                     email: user.email,
                     connectCode: user.connectCode,
-                    token
                 }
-            });
+            })
+
+
         } catch (error) {
-            console.error("Login error:", error);
-            return res.status(500).json({ message: "Login error" });
+            console.error("Login error", error);
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 
-    static async getMe(req, res) {
+    static async me(req, res) {
         try {
-            const user = await User.findById(req.user.id);
+            const user = await User.findById(req.user.id).select("-password");
+
             if (!user) {
-                return res.status(404).json({ message: "User not found" });
+                return res.status(400).json({ message: "User not found" });
             }
-            return res.status(200).json({
-                message: "User found successfully",
+
+            res.status(200).json({
                 user: {
-                    id: user._id,
-                    name: user.name,
+                    id: user.id,
                     username: user.username,
+                    fullName: user.fullName,
                     email: user.email,
-                    connectCode: user.connectCode
+                    connectCode: user.connectCode,
                 }
-            });
+            })
+
         } catch (error) {
-            console.error("Get me error:", error);
-            return res.status(500).json({ message: "Get me error" });
+            console.error("Me error", error);
+            res.status(500).json({ message: "Internal server error" });
         }
     }
 
     static async logout(req, res) {
-        try {
-            return res.status(200).json({ message: "Logout successfully" });
-        } catch (error) {
-            console.error("Logout error:", error);
-            return res.status(500).json({ message: "Logout error" });
-        }
+        res.cookie("jwt", "", { maxAge: 0 });
+        res.json({ message: "Logged out successfully!" });
     }
 }
 

@@ -20,7 +20,7 @@ const MessageInput: React.FC = () => {
 
         socket.emit("conversation:typing", {
             userId: user.id,
-            friendId: selectedConversation.friend._id,
+            friendId: selectedConversation.friend.id,
             isTyping,
         });
         isTypingRef.current = isTyping;
@@ -34,7 +34,7 @@ const MessageInput: React.FC = () => {
         socket.emit("conversation:send-message", {
             conversationId: selectedConversation.conversationId,
             userId: user.id,
-            friendId: selectedConversation.friend._id,
+            friendId: selectedConversation.friend.id,
             content: message.trim(),
         });
 
@@ -62,14 +62,20 @@ const MessageInput: React.FC = () => {
     };
 
 
-    return <div className="p-4 border border-gray-200 bg-white">
-        <div className="flex items-center">
-            <div className="flex-1">
+    return <div className="p-4 border-t border-white/5 bg-slate-900/40 backdrop-blur-md z-10">
+        <div className="flex items-center max-w-4xl mx-auto">
+            <div className="flex-1 relative">
                 <textarea
                     placeholder="Type a message..."
-                    className="w-full text-sm bg-gray-100 rounded-full py-3 px-4 focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"
+                    className="w-full text-sm bg-slate-800/60 text-slate-100 placeholder:text-slate-500 rounded-full py-3.5 px-5 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 border border-slate-700/50 resize-none block overflow-hidden leading-[1.2rem] h-[44px]"
                     value={message}
                     onChange={(e) => handleOnChange(e)}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                        }
+                    }}
                 />
             </div>
 
@@ -77,9 +83,10 @@ const MessageInput: React.FC = () => {
                 <button
                     onClick={handleSendMessage}
                     type="button"
-                    className="bg-sky-500 text-white rounded-full size-10 flex items-center justify-center hover:bg-sky-600 cursor-pointer"
+                    disabled={!message.trim()}
+                    className="bg-cyan-500 text-white rounded-full size-11 flex items-center justify-center hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] hover:shadow-[0_0_20px_rgba(6,182,212,0.5)]"
                 >
-                    <Send className="size-[16px]" />
+                    <Send className="size-[18px] ml-0.5" />
                 </button>
             </div>
         </div>

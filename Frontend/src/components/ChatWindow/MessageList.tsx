@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { Loader2 } from "lucide-react";
 import { useMessages } from "../../hooks/useMessages";
 import { useConversationStore } from "../../stores/conversationStore";
 import MessageItem from "./MessageItem";
@@ -44,36 +45,41 @@ const MessageList: React.FC = () => {
             socket?.emit("conversation:mark-as-read", {
                 conversationId: activeConversationId,
                 userId: user.id,
-                friendId: selectedConversation.friend._id,
+                friendId: selectedConversation.friend.id,
             });
         }
 
     }, [data, activeConversationId, socket, user, selectedConversation])
 
-    useMessageListen(activeConversationId || undefined, selectedConversation?.friend._id, containerRef);
+    useMessageListen(activeConversationId || undefined, selectedConversation?.friend.id, containerRef);
 
     const { isTyping } = useTypingListen(
-        selectedConversation?.friend._id,
+        selectedConversation?.friend.id,
         containerRef
     )
 
     if (isLoading) {
         return <div className="relative flex-1 h-full flex items-center justify-center">
-            <div className="size-10 bg-sky-100 rounded-full animate-pulse"></div>
+            <Loader2 className="w-8 h-8 animate-spin text-cyan-500" />
         </div>
     }
 
-    return <div ref={containerRef} className="flex-1 bg-gray-50 overflow-y-auto p-4 pb-10">
-        {hasNextPage && <div className="flex justify-center mb-4">
+    return <div ref={containerRef} className="flex-1 bg-transparent overflow-y-auto p-4 pb-10 scrollbar-thin scrollbar-thumb-white/5 hover:scrollbar-thumb-white/10">
+        {hasNextPage && <div className="flex justify-center mb-6 mt-2">
             <button
                 type="button"
-                className="px-2 py-1 text-xs bg-gray-300 text-white rounded-lg
-                    hover:bg-gray-400 transition-colors cursor-pointer
-                "
+                className="px-4 py-1.5 text-xs font-medium bg-slate-800/60 text-slate-300 rounded-full border border-slate-700/50 hover:bg-slate-700/60 hover:text-white transition-all cursor-pointer backdrop-blur-sm shadow-sm flex items-center space-x-2"
                 onClick={handleLoadMore}
                 disabled={isFetchingNextPage}
             >
-                {isFetchingNextPage ? 'Loading...' : 'Load More'}
+                {isFetchingNextPage ? (
+                    <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-cyan-500" />
+                        <span>Loading older messages...</span>
+                    </>
+                ) : (
+                    <span>Load previous messages</span>
+                )}
             </button>
         </div>}
 
