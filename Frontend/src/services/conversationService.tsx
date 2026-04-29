@@ -5,8 +5,8 @@ export const conversationService = {
         const response = await apiClient.get("/conversations");
         return response.data;
     },
-    async checkConnectCode(connectCode: string) {
-        const response = await apiClient.get(`/conversations/check-connect-code?connectCode=${connectCode}`);
+    async checkMobileNumber(mobileNumber: string) {
+        const response = await apiClient.get(`/conversations/check-mobile-number?mobileNumber=${mobileNumber}`);
         return response.data;
     },
     async getMessages(conversationId: string) {

@@ -7,6 +7,7 @@ export type User = {
     fullName: string;
     username: string;
     email: string;
+    mobileNumber: string;
     avatar?: string;
     bio?: string;
     isVerified: boolean;
@@ -21,10 +22,11 @@ interface AuthStore {
     isLoading: boolean;
     error: string | null;
     setUser: (user: User | null) => void;
-    register: (userData: { fullName: string; username: string; email: string; password: string }) => Promise<void>;
+    register: (userData: { fullName: string; username: string; email: string; mobileNumber: string; password: string }) => Promise<void>;
     login: (userData: { email: string; password: string }) => Promise<void>;
     logout: () => Promise<void>;
     getCurrentUser: () => Promise<void>;
+    updateProfile: (userData: { fullName?: string; username?: string }) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -114,6 +116,22 @@ export const useAuthStore = create<AuthStore>()(
                         isLoading: false,
                         user: null,
                         isAuthenticated: false,
+                    });
+                    throw error;
+                }
+            },
+            updateProfile: async (userData) => {
+                set({ isLoading: true, error: null });
+                try {
+                    const response = await authService.updateProfile(userData);
+                    set({
+                        user: response.user,
+                        isLoading: false,
+                    });
+                } catch (error: any) {
+                    set({
+                        error: error?.response?.data?.message || error?.message || "Failed to update profile",
+                        isLoading: false,
                     });
                     throw error;
                 }

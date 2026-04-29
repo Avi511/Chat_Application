@@ -13,7 +13,7 @@ interface Conversation {
         username: string;
         fullName: string;
         avatar?: string;
-        connectCode: string;
+        mobileNumber: string;
         online: boolean;
         lastSeen: string;
     };

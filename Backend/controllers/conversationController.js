@@ -4,15 +4,15 @@ import User from "../models/User.js"
 import RedisService from "../services/RedisService.js";
 
 class ConversationController {
-    static async checkConnectCode(req, res) {
+    static async checkMobileNumber(req, res) {
         try {
             const userId = req.user._id;
-            const { connectCode } = req.query;
+            const { mobileNumber } = req.query;
 
-            const friend = await User.findOne({ connectCode });
+            const friend = await User.findOne({ mobileNumber });
 
             if (!friend || friend._id.toString() === userId.toString()) {
-                return res.status(400).json({ message: "Invalid connect ID" });
+                return res.status(400).json({ message: "Invalid mobile number" });
             }
 
             const existingFriendship = await Friendship.findOne({
@@ -28,11 +28,11 @@ class ConversationController {
 
             res.json({
                 success: true,
-                message: "Connect ID is valid"
+                message: "Mobile number is valid"
             });
 
         } catch (error) {
-            console.error("Error checking connect code", error);
+            console.error("Error checking mobile number", error);
             res.status(500).json({ message: 'Internal server error' })
         }
     }
@@ -48,8 +48,8 @@ class ConversationController {
                     { recipient: userId },
                 ],
             }).populate([
-                { path: 'requester', select: 'id fullName username connectCode' },
-                { path: 'recipient', select: 'id fullName username connectCode' },
+                { path: 'requester', select: 'id fullName username mobileNumber' },
+                { path: 'recipient', select: 'id fullName username mobileNumber' },
             ]).lean();
 
             if (!friendships.length) {
@@ -97,7 +97,7 @@ class ConversationController {
                             id: friend._id.toString(),
                             username: friend.username,
                             fullName: friend.fullName,
-                            connectCode: friend.connectCode,
+                            mobileNumber: friend.mobileNumber,
                             online: await RedisService.isUserOnline(friend._id.toString()),
                         }
                     }

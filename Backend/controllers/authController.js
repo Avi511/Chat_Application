@@ -1,15 +1,15 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import User from "../models/User.js"
-import generateUniqueConnectCode from "../utils/generateUniqueConnectCode.js";
+
 
 
 class AuthController {
     static async register(req, res) {
         try {
-            const { fullName, username, email, password } = req.body;
+            const { fullName, username, email, mobileNumber, password } = req.body;
 
-            if (!fullName || !username || !email || !password) {
+            if (!fullName || !username || !email || !mobileNumber || !password) {
                 return res.status(400).json({ message: "All fields are required" });
             }
 
@@ -18,11 +18,11 @@ class AuthController {
             }
 
             const existingUser = await User.findOne({
-                $or: [{ username }, { email }]
+                $or: [{ username }, { email }, { mobileNumber }]
             });
 
             if (existingUser) {
-                return res.status(400).json({ message: "User already exists with username or email" });
+                return res.status(400).json({ message: "User already exists with username, email, or mobile number" });
             }
 
             // hash password
@@ -33,8 +33,8 @@ class AuthController {
                 username,
                 fullName,
                 email,
+                mobileNumber,
                 password: hashedPassword,
-                connectCode: await generateUniqueConnectCode(),
             });
 
             await user.save();
@@ -84,7 +84,7 @@ class AuthController {
                     username: user.username,
                     fullName: user.fullName,
                     email: user.email,
-                    connectCode: user.connectCode,
+                    mobileNumber: user.mobileNumber,
                 }
             })
 
@@ -109,7 +109,7 @@ class AuthController {
                     username: user.username,
                     fullName: user.fullName,
                     email: user.email,
-                    connectCode: user.connectCode,
+                    mobileNumber: user.mobileNumber,
                 }
             })
 
@@ -123,6 +123,44 @@ class AuthController {
         res.cookie("jwt", "", { maxAge: 0 });
         res.cookie("token", "", { maxAge: 0 });
         res.json({ message: "Logged out successfully!" });
+    }
+
+    static async updateProfile(req, res) {
+        try {
+            const { fullName, username } = req.body;
+            const userId = req.user._id;
+
+            if (!fullName && !username) {
+                return res.status(400).json({ message: "No data provided for update" });
+            }
+
+            const updateData = {};
+            if (fullName) updateData.fullName = fullName;
+            if (username) {
+                const existingUser = await User.findOne({ username, _id: { $ne: userId } });
+                if (existingUser) {
+                    return res.status(400).json({ message: "Username already taken" });
+                }
+                updateData.username = username;
+            }
+
+            const user = await User.findByIdAndUpdate(userId, updateData, { new: true }).select("-password");
+
+            res.status(200).json({
+                message: "Profile updated successfully",
+                user: {
+                    id: user.id,
+                    username: user.username,
+                    fullName: user.fullName,
+                    email: user.email,
+                    mobileNumber: user.mobileNumber,
+                }
+            });
+
+        } catch (error) {
+            console.error("Update profile error", error);
+            res.status(500).json({ message: "Internal server error" });
+        }
     }
 }
 

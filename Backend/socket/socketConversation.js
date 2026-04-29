@@ -45,9 +45,9 @@ export const conversationRequest = async (io, socket, data) => {
     try {
         const userId = socket.userId;
         const user = socket.user;
-        const { connectCode } = data;
+        const { mobileNumber } = data;
 
-        const friend = await User.findOne({ connectCode });
+        const friend = await User.findOne({ mobileNumber });
         if (!friend) {
             socket.emit("conversation:request:error", { error: "Unable to find conversation" });
             return;
@@ -98,7 +98,7 @@ export const conversationRequest = async (io, socket, data) => {
                 id: friend.id,
                 fullName: friend.fullName,
                 username: friend.username,
-                connectCode: friend.connectCode,
+                mobileNumber: friend.mobileNumber,
                 online: await RedisService.isUserOnline(friend._id.toString()),
             }
         })
@@ -109,7 +109,7 @@ export const conversationRequest = async (io, socket, data) => {
                 id: user.id,
                 fullName: user.fullName,
                 username: user.username,
-                connectCode: user.connectCode,
+                mobileNumber: user.mobileNumber,
                 online: await RedisService.isUserOnline(user._id.toString()),
             }
         })

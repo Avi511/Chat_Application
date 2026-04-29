@@ -20,10 +20,10 @@ const UserProfile = () => {
     };
 
     const copyConnectId = () => {
-        if (user?.connectCode) {
-            navigator.clipboard.writeText(user.connectCode);
+        if (user?.mobileNumber) {
+            navigator.clipboard.writeText(user.mobileNumber);
             setCopied(true);
-            toast.success("Connect ID copied!");
+            toast.success("Mobile number copied!");
             setTimeout(() => setCopied(false), 2000);
         }
     };
@@ -38,7 +38,7 @@ const UserProfile = () => {
                 </div>
                 <div>
                     <h3 className="text-sm font-semibold text-white">
-                        {user.fullName || user.username} <span className="font-normal text-slate-500">({user.connectCode})</span>
+                        {user.fullName || user.username} <span className="font-normal text-slate-500">({user.mobileNumber})</span>
                     </h3>
                     <p className="text-xs text-green-400">Online</p>
                 </div>

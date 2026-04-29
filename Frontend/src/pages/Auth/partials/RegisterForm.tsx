@@ -4,13 +4,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuthStore } from "../../../stores/authStore";
 import { toast } from "sonner";
-import { Mail, Lock, User, Loader2, Eye, EyeOff, ShieldCheck, AtSign } from "lucide-react";
+import { Mail, Lock, User, Loader2, Eye, EyeOff, ShieldCheck, AtSign, Phone } from "lucide-react";
 import type { NavigateFunction } from "react-router-dom";
 
 const registerSchema = z.object({
     fullName: z.string().min(2, "Full name must be at least 2 characters"),
     username: z.string().min(3, "Username must be at least 3 characters").regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
     email: z.string().email("Invalid email address"),
+    mobileNumber: z.string().regex(/^\d{10,15}$/, "Invalid mobile number"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm password must be at least 6 characters"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -44,6 +45,7 @@ const RegisterForm = ({ navigate, onSuccess }: RegisterFormProps) => {
                 fullName: data.fullName,
                 username: data.username,
                 email: data.email,
+                mobileNumber: data.mobileNumber,
                 password: data.password
             });
             toast.success("Account created successfully! Please login.");
@@ -125,6 +127,30 @@ const RegisterForm = ({ navigate, onSuccess }: RegisterFormProps) => {
                 </div>
                 {errors.email && (
                     <p className="mt-2 text-xs text-red-400 pl-1">{errors.email.message}</p>
+                )}
+            </div>
+
+            {/* Mobile Number - Full Width */}
+            <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2 pl-1">
+                    Mobile Number
+                </label>
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                        <Phone size={18} />
+                    </div>
+                    <input
+                        {...register("mobileNumber")}
+                        type="text"
+                        placeholder="1234567890"
+                        className={`w-full pl-11 pr-4 py-3 bg-slate-900/80 text-white placeholder:text-slate-500 border rounded-2xl focus:outline-none focus:ring-2 transition-all ${errors.mobileNumber
+                            ? "border-red-500/70 focus:ring-red-500/30"
+                            : "border-slate-700 focus:border-cyan-400/60 focus:ring-cyan-400/20"
+                            }`}
+                    />
+                </div>
+                {errors.mobileNumber && (
+                    <p className="mt-2 text-xs text-red-400 pl-1">{errors.mobileNumber.message}</p>
                 )}
             </div>
 

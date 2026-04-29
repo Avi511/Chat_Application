@@ -1,9 +1,11 @@
 import { Contact, Settings } from "lucide-react";
 import { useState } from "react";
 import AddConversationModal from "./AddConversationalModel";
+import SettingsModal from "./SettingsModal";
 
 const Header: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     return (
         <div className="flex items-center justify-between px-4 py-4">
@@ -21,6 +23,7 @@ const Header: React.FC = () => {
                     <Contact size={18} className="text-white" />
                 </button>
                 <button 
+                    onClick={() => setIsSettingsOpen(true)}
                     className="p-2 rounded-full hover:bg-white/20 transition cursor-pointer"
                     title="Settings"
                 >
@@ -31,6 +34,11 @@ const Header: React.FC = () => {
             <AddConversationModal
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}
+            />
+
+            <SettingsModal
+                isOpen={isSettingsOpen}
+                onClose={() => setIsSettingsOpen(false)}
             />
         </div>
     );

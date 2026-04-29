@@ -3,7 +3,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner"
-import { Loader2, Wifi } from "lucide-react"
+import { Loader2, Phone } from "lucide-react"
 
 import { conversationService } from "../../services/conversationService";
 import { useSocket } from "../../context/SocketContext";
@@ -11,7 +11,7 @@ import Modal from "../UI/Model";
 import { useQuery } from "@tanstack/react-query";
 
 const addConversationSchema = z.object({
-    connectCode: z.string().min(6, { message: "Invalid connect ID" })
+    mobileNumber: z.string().regex(/^\d{10,15}$/, { message: "Invalid mobile number" })
 })
 
 type AddConversationFormData = z.infer<typeof addConversationSchema>
@@ -36,11 +36,11 @@ const AddConversationModal: React.FC<AddConversationModalProps> = ({
     })
     const { socket } = useSocket();
 
-    const connectCode = watch('connectCode');
+    const mobileNumber = watch('mobileNumber');
 
     const { isFetching, refetch } = useQuery({
-        queryKey: ["checkConnectCode", connectCode],
-        queryFn: () => conversationService.checkConnectCode(connectCode),
+        queryKey: ["checkMobileNumber", mobileNumber],
+        queryFn: () => conversationService.checkMobileNumber(mobileNumber),
         enabled: false,
         retry: false
     })
@@ -50,11 +50,11 @@ const AddConversationModal: React.FC<AddConversationModalProps> = ({
 
         if (result?.data?.success) {
             socket?.emit('conversation:request', {
-                connectCode: formData.connectCode,
+                mobileNumber: formData.mobileNumber,
             })
             onClose();
         } else {
-            const errorMessage = (result.error as any)?.response?.data?.message ?? "Invalid connect ID";
+            const errorMessage = (result.error as any)?.response?.data?.message ?? "Invalid mobile number";
             toast.error(errorMessage);
         }
     }
@@ -72,16 +72,16 @@ const AddConversationModal: React.FC<AddConversationModalProps> = ({
             title="Add Conversation"
         >
             <form onSubmit={handleSubmit(onSubmit)}>
-                <label htmlFor="connectCode" className="block text-slate-300 mb-2 text-sm font-medium">Connect ID</label>
+                <label htmlFor="mobileNumber" className="block text-slate-300 mb-2 text-sm font-medium">Mobile Number</label>
                 <div className="relative mb-4">
-                    <Wifi className="absolute inset-y-0 left-3 size-5 text-slate-400 top-1/2 -translate-y-1/2" />
+                    <Phone className="absolute inset-y-0 left-3 size-5 text-slate-400 top-1/2 -translate-y-1/2" />
                     <input
-                        {...register('connectCode')}
-                        placeholder="Enter 6-digit ID"
+                        {...register('mobileNumber')}
+                        placeholder="Enter mobile number"
                         className="text-white bg-slate-800/50 w-full pl-10 pr-3 py-3 border border-white/10 rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-colors placeholder:text-slate-500"
                     />
                 </div>
-                {errors.connectCode && <p className="text-red-400 text-xs mt-1 mb-3">{errors.connectCode.message}</p>}
+                {errors.mobileNumber && <p className="text-red-400 text-xs mt-1 mb-3">{errors.mobileNumber.message}</p>}
                 <button
                     type="submit"
                     disabled={isFetching}
