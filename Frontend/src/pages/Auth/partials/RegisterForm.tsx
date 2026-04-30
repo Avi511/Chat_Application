@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuthStore } from "../../../stores/authStore";
 import { toast } from "sonner";
-import { Mail, Lock, User, Loader2, Eye, EyeOff, ShieldCheck, AtSign, Phone } from "lucide-react";
+import { Mail, Lock, User, Loader2, Eye, EyeOff, ShieldCheck, AtSign, Phone, Image as ImageIcon, Camera, X } from "lucide-react";
 import type { NavigateFunction } from "react-router-dom";
 
 const registerSchema = z.object({
@@ -14,6 +14,7 @@ const registerSchema = z.object({
     mobileNumber: z.string().regex(/^\d{10,15}$/, "Invalid mobile number"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(6, "Confirm password must be at least 6 characters"),
+    profilePicture: z.any().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
@@ -30,6 +31,8 @@ const RegisterForm = ({ navigate, onSuccess }: RegisterFormProps) => {
     const { register: registerUser, isLoading } = useAuthStore();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const {
         register,
@@ -41,13 +44,17 @@ const RegisterForm = ({ navigate, onSuccess }: RegisterFormProps) => {
 
     const onSubmit = async (data: RegisterFormValues) => {
         try {
-            await registerUser({
-                fullName: data.fullName,
-                username: data.username,
-                email: data.email,
-                mobileNumber: data.mobileNumber,
-                password: data.password
-            });
+            const formData = new FormData();
+            formData.append("fullName", data.fullName);
+            formData.append("username", data.username);
+            formData.append("email", data.email);
+            formData.append("mobileNumber", data.mobileNumber);
+            formData.append("password", data.password);
+            if (selectedFile) {
+                formData.append("profilePicture", selectedFile);
+            }
+
+            await registerUser(formData);
             toast.success("Account created successfully! Please login.");
             onSuccess();
         } catch (error: any) {
@@ -55,8 +62,63 @@ const RegisterForm = ({ navigate, onSuccess }: RegisterFormProps) => {
         }
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("Image size should be less than 5MB");
+                return;
+            }
+            setSelectedFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const removeImage = () => {
+        setImagePreview(null);
+        setSelectedFile(null);
+    };
+
     return (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Profile Picture Upload */}
+            <div className="flex flex-col items-center justify-center space-y-4 mb-2">
+                <div className="relative group">
+                    <div className={`w-24 h-24 rounded-full overflow-hidden border-2 flex items-center justify-center transition-all ${imagePreview ? 'border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.3)]' : 'border-slate-700 bg-slate-900/50'}`}>
+                        {imagePreview ? (
+                            <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                        ) : (
+                            <ImageIcon className="text-slate-600" size={40} />
+                        )}
+                    </div>
+                    
+                    <label className="absolute bottom-0 right-0 p-2 bg-cyan-500 rounded-full text-white cursor-pointer hover:bg-cyan-400 transition-colors shadow-lg">
+                        <Camera size={16} />
+                        <input 
+                            type="file" 
+                            accept="image/*" 
+                            className="hidden" 
+                            onChange={handleImageChange}
+                        />
+                    </label>
+
+                    {imagePreview && (
+                        <button
+                            type="button"
+                            onClick={removeImage}
+                            className="absolute -top-2 -right-2 p-1 bg-red-500 rounded-full text-white hover:bg-red-400 transition-colors shadow-lg"
+                        >
+                            <X size={14} />
+                        </button>
+                    )}
+                </div>
+                <p className="text-xs text-slate-400">Add a profile picture (Optional)</p>
+            </div>
+
             {/* Full Name and Username Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>

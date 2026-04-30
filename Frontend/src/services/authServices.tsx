@@ -1,8 +1,12 @@
 import apiClient from "../utils/apiClient";
 
 export const authService = {
-    async register(userData: { fullName: string, username: string, email: string, password: string }) {
-        const response = await apiClient.post("/auth/register", userData);
+    async register(userData: FormData) {
+        const response = await apiClient.post("/auth/register", userData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
         return response.data;
     },
     async login(userData: { email: string, password: string }) {

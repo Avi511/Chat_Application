@@ -35,6 +35,14 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true,
         minLength: 6
+    },
+    profilePicture: {
+        type: String,
+        default: ""
+    },
+    profilePicturePublicId: {
+        type: String,
+        default: ""
     }
 })
 

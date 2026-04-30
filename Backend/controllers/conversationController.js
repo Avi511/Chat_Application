@@ -2,6 +2,7 @@ import Conversation from "../models/Conversation.js"
 import Friendship from "../models/Friendship.js"
 import User from "../models/User.js"
 import RedisService from "../services/RedisService.js";
+import { getSignedUrl } from "../utils/cloudinary.js";
 
 class ConversationController {
     static async checkMobileNumber(req, res) {
@@ -48,8 +49,8 @@ class ConversationController {
                     { recipient: userId },
                 ],
             }).populate([
-                { path: 'requester', select: 'id fullName username mobileNumber' },
-                { path: 'recipient', select: 'id fullName username mobileNumber' },
+                { path: 'requester', select: 'id fullName username mobileNumber profilePicture profilePicturePublicId' },
+                { path: 'recipient', select: 'id fullName username mobileNumber profilePicture profilePicturePublicId' },
             ]).lean();
 
             if (!friendships.length) {
@@ -98,6 +99,7 @@ class ConversationController {
                             username: friend.username,
                             fullName: friend.fullName,
                             mobileNumber: friend.mobileNumber,
+                            profilePicture: friend.profilePicturePublicId ? getSignedUrl(friend.profilePicturePublicId) : friend.profilePicture,
                             online: await RedisService.isUserOnline(friend._id.toString()),
                         }
                     }

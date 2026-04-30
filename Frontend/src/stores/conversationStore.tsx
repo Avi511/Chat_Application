@@ -12,7 +12,7 @@ interface Conversation {
         id: string;
         username: string;
         fullName: string;
-        avatar?: string;
+        profilePicture?: string;
         mobileNumber: string;
         online: boolean;
         lastSeen: string;

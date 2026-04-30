@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import User from "../models/User.js"
+import cloudinary, { getSignedUrl } from "../utils/cloudinary.js"
 
 
 
@@ -29,12 +30,28 @@ class AuthController {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(password, salt);
 
+            let profilePictureUrl = "/profileicon.jpg";
+            let profilePicturePublicId = "";
+            if (req.file) {
+                const fileBase64 = req.file.buffer.toString("base64");
+                const fileUri = `data:${req.file.mimetype};base64,${fileBase64}`;
+                
+                const uploadResponse = await cloudinary.uploader.upload(fileUri, {
+                    folder: "profile_pictures",
+                    type: "private"
+                });
+                profilePictureUrl = uploadResponse.secure_url;
+                profilePicturePublicId = uploadResponse.public_id;
+            }
+
             const user = new User({
                 username,
                 fullName,
                 email,
                 mobileNumber,
                 password: hashedPassword,
+                profilePicture: profilePictureUrl,
+                profilePicturePublicId: profilePicturePublicId
             });
 
             await user.save();
@@ -85,6 +102,7 @@ class AuthController {
                     fullName: user.fullName,
                     email: user.email,
                     mobileNumber: user.mobileNumber,
+                    profilePicture: user.profilePicturePublicId ? getSignedUrl(user.profilePicturePublicId) : user.profilePicture
                 }
             })
 
@@ -110,6 +128,7 @@ class AuthController {
                     fullName: user.fullName,
                     email: user.email,
                     mobileNumber: user.mobileNumber,
+                    profilePicture: user.profilePicturePublicId ? getSignedUrl(user.profilePicturePublicId) : user.profilePicture
                 }
             })
 
@@ -154,6 +173,7 @@ class AuthController {
                     fullName: user.fullName,
                     email: user.email,
                     mobileNumber: user.mobileNumber,
+                    profilePicture: user.profilePicturePublicId ? getSignedUrl(user.profilePicturePublicId) : user.profilePicture
                 }
             });
 

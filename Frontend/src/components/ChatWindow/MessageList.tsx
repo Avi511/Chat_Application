@@ -83,13 +83,20 @@ const MessageList: React.FC = () => {
             </button>
         </div>}
 
-        {allMessages.map((message: any) => (
-            <div key={message._id || message.messageId}>
-                <MessageItem {...message} />
-            </div>
-        ))}
+        {allMessages.map((message: any) => {
+            const isUserSender = (message.sender?._id || message.senderId) === user?.id;
+            const profilePic = isUserSender 
+                ? user?.profilePicture 
+                : selectedConversation?.friend.profilePicture;
+                
+            return (
+                <div key={message._id || message.messageId}>
+                    <MessageItem {...message} profilePicture={profilePic} />
+                </div>
+            );
+        })}
 
-        {isTyping && <TypingIndicator />}
+        {isTyping && <TypingIndicator profilePicture={selectedConversation?.friend.profilePicture} />}
     </div>
 }
 

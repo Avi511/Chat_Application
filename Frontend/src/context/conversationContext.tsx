@@ -22,7 +22,7 @@ export type Conversation = {
         id: string;
         username: string;
         fullName: string;
-        avatar?: string;
+        profilePicture?: string;
         mobileNumber: string;
         online: boolean;
         lastSeen: string;
@@ -138,7 +138,7 @@ export const ConversationProvider = ({ children }: { children: React.ReactNode }
                     id: data.friend.id || data.friend._id,
                     username: data.friend.username,
                     fullName: data.friend.fullName || data.friend.name,
-                    avatar: data.friend.avatar,
+                    profilePicture: data.friend.profilePicture,
                     mobileNumber: data.friend.mobileNumber,
                     online: data.friend.online,
                     lastSeen: data.friend.lastSeen || new Date().toISOString(),

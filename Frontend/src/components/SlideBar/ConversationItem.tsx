@@ -51,9 +51,9 @@ const ConversationItem: React.FC<Conversation> = ({
             }`}
         >
             <div className="relative shrink-0">
-                {friend.avatar ? (
+                {friend.profilePicture ? (
                     <img
-                        src={friend.avatar}
+                        src={friend.profilePicture}
                         alt={friend.fullName || friend.username}
                         className="w-12 h-12 rounded-full object-cover"
                     />

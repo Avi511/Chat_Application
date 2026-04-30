@@ -1,7 +1,7 @@
-const TypingIndicator: React.FC = () => {
+const TypingIndicator: React.FC<{ profilePicture?: string }> = ({ profilePicture }) => {
     return <div className="flex mb-4 items-end">
         <img
-            src="https://avatar.iran.liara.run/public"
+            src={profilePicture || "/profileicon.jpg"}
             alt="User"
             className="w-8 h-8 rounded-full object-cover mr-2 mb-1 shadow-sm"
         />

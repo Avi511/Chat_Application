@@ -8,7 +8,7 @@ export type User = {
     username: string;
     email: string;
     mobileNumber: string;
-    avatar?: string;
+    profilePicture?: string;
     bio?: string;
     isVerified: boolean;
     createdAt: string;
@@ -22,7 +22,7 @@ interface AuthStore {
     isLoading: boolean;
     error: string | null;
     setUser: (user: User | null) => void;
-    register: (userData: { fullName: string; username: string; email: string; mobileNumber: string; password: string }) => Promise<void>;
+    register: (userData: FormData) => Promise<void>;
     login: (userData: { email: string; password: string }) => Promise<void>;
     logout: () => Promise<void>;
     getCurrentUser: () => Promise<void>;

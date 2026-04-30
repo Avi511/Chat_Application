@@ -9,6 +9,7 @@ export interface MessageProps {
     read?: boolean;
     createdAt?: string;
     timestamp?: string;
+    profilePicture?: string;
 }
 
 const MessageItem: React.FC<MessageProps> = ({
@@ -16,7 +17,8 @@ const MessageItem: React.FC<MessageProps> = ({
     senderId,
     content,
     createdAt,
-    timestamp
+    timestamp,
+    profilePicture
 }) => {
     const { user } = useAuthStore();
     
@@ -55,7 +57,7 @@ const MessageItem: React.FC<MessageProps> = ({
 
     return <div className="flex mb-4 items-end">
         <img
-            src="https://avatar.iran.liara.run/public"
+            src={profilePicture || "/profileicon.jpg"}
             alt={sender?.username || "User"}
             className="w-8 h-8 rounded-full object-cover mr-2 mb-1"
         />
