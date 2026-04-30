@@ -26,7 +26,7 @@ interface AuthStore {
     login: (userData: { email: string; password: string }) => Promise<void>;
     logout: () => Promise<void>;
     getCurrentUser: () => Promise<void>;
-    updateProfile: (userData: { fullName?: string; username?: string }) => Promise<void>;
+    updateProfile: (userData: FormData) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthStore>()(

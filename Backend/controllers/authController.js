@@ -149,8 +149,13 @@ class AuthController {
             const { fullName, username } = req.body;
             const userId = req.user._id;
 
-            if (!fullName && !username) {
+            if (!fullName && !username && !req.file) {
                 return res.status(400).json({ message: "No data provided for update" });
+            }
+
+            const userToUpdate = await User.findById(userId);
+            if (!userToUpdate) {
+                return res.status(404).json({ message: "User not found" });
             }
 
             const updateData = {};
@@ -161,6 +166,30 @@ class AuthController {
                     return res.status(400).json({ message: "Username already taken" });
                 }
                 updateData.username = username;
+            }
+
+            if (req.file) {
+                // Delete old image from Cloudinary if it exists
+                if (userToUpdate.profilePicturePublicId) {
+                    try {
+                        await cloudinary.uploader.destroy(userToUpdate.profilePicturePublicId, {
+                            type: 'private'
+                        });
+                    } catch (err) {
+                        console.error("Error deleting old profile picture from Cloudinary", err);
+                    }
+                }
+
+                // Upload new image
+                const fileBase64 = req.file.buffer.toString("base64");
+                const fileUri = `data:${req.file.mimetype};base64,${fileBase64}`;
+                
+                const uploadResponse = await cloudinary.uploader.upload(fileUri, {
+                    folder: "profile_pictures",
+                    type: "private"
+                });
+                updateData.profilePicture = uploadResponse.secure_url;
+                updateData.profilePicturePublicId = uploadResponse.public_id;
             }
 
             const user = await User.findByIdAndUpdate(userId, updateData, { new: true }).select("-password");

@@ -9,6 +9,6 @@ router.post("/register", upload.single("profilePicture"), AuthController.registe
 router.post("/login", AuthController.login);
 router.get("/me", authMiddleware, AuthController.me);
 router.post("/logout", authMiddleware, AuthController.logout);
-router.put("/update-profile", authMiddleware, AuthController.updateProfile);
+router.put("/update-profile", authMiddleware, upload.single("profilePicture"), AuthController.updateProfile);
 
 export default router;
