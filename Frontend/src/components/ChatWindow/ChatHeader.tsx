@@ -1,5 +1,5 @@
 import type React from "react";
-import { EllipsisVertical, X } from "lucide-react";
+import { EllipsisVertical, ChevronLeft } from "lucide-react";
 import { useConversationStore } from "../../stores/conversationStore";
 
 const ChatHeader: React.FC = () => {
@@ -9,7 +9,15 @@ const ChatHeader: React.FC = () => {
     if (!selectedConversation) return null;
 
     return <div className="p-4 border-b border-white/10 bg-white/5 backdrop-blur-md flex items-center justify-between z-10">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2 md:space-x-3">
+            {/* Back Button for mobile */}
+            <button 
+                onClick={() => setActiveConversation(null)} 
+                className="md:hidden text-slate-400 hover:text-white mr-1 -ml-1 p-2 hover:bg-white/10 rounded-full transition-colors"
+            >
+                <ChevronLeft className="size-6" />
+            </button>
+
             <div className="relative">
                 <img 
                     src={selectedConversation.friend.profilePicture || "/profileicon.jpg"} 
@@ -21,18 +29,17 @@ const ChatHeader: React.FC = () => {
                 )}
             </div>
             <div>
-                <h2 className="font-semibold text-white">{selectedConversation.friend.fullName || selectedConversation.friend.username}</h2>
-                <p className={`text-xs ${selectedConversation.friend.online ? 'text-green-400' : 'text-slate-500'}`}>
+                <h2 className="font-semibold text-white text-sm md:text-base truncate max-w-[150px] md:max-w-none">
+                    {selectedConversation.friend.fullName || selectedConversation.friend.username}
+                </h2>
+                <p className={`text-[10px] md:text-xs ${selectedConversation.friend.online ? 'text-green-400' : 'text-slate-500'}`}>
                     {selectedConversation.friend.online ? 'Online' : 'Offline'}
                 </p>
             </div>
         </div>
-        <div className="flex space-x-4">
+        <div className="flex items-center">
             <button className="text-slate-400 hover:text-white transition-colors cursor-pointer p-2 hover:bg-white/10 rounded-full">
                 <EllipsisVertical className="size-5" />
-            </button>
-            <button onClick={() => setActiveConversation(null)} className="sm:hidden text-slate-400 hover:text-cyan-400 transition-colors cursor-pointer p-2 hover:bg-white/10 rounded-full">
-                <X className="size-5" />
             </button>
         </div>
     </div>

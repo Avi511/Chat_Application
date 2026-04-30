@@ -20,37 +20,39 @@ const ConversationItem: React.FC<Conversation> = ({
         const decrypt = async () => {
             if (!user || !lastMessage?.content) return;
 
-            // If not encrypted, just show content
+            // 1. Check if the message is actually encrypted
             if (!lastMessage.senderKey || !lastMessage.recipientKey) {
                 setDecryptedPreview(lastMessage.content);
+                setIsDecrypting(false);
+                return;
+            }
+
+            // 2. Wait for Private Key presence
+            const storedPrivateKey = localStorage.getItem(`prv_key_${user.id}`);
+            if (!storedPrivateKey) {
+                setDecryptedPreview("[Encrypted]");
+                setIsDecrypting(false);
                 return;
             }
 
             setIsDecrypting(true);
             try {
-                const storedPrivateKey = localStorage.getItem(`prv_key_${user.id}`);
-                if (!storedPrivateKey) {
-                    setDecryptedPreview("[Encrypted]");
-                    return;
-                }
-
                 const privateKey = await CryptoUtils.importPrivateKey(storedPrivateKey);
-                const isSentByMe = lastMessage.senderKey && !lastMessage.recipientKey; // This logic might need refinement based on how preview is stored
                 
-                // Usually for preview, we just try both or determine from context.
-                // In my implementation, senderKey is for the sender, recipientKey is for the recipient.
-                // But who is the 'me' in this conversation?
-                
-                // Let's check if the last message was sent by me or the friend.
-                // We don't have senderId in the preview, but we can try to decrypt with both if needed, 
-                // or ideally the backend should have told us who sent it.
-                
-                // Since it's 1-on-1, I'll try decrypting with my private key using both encrypted keys.
-                // One will work, one will fail.
-                
-                let decrypted = await CryptoUtils.decryptMessage(lastMessage.content, lastMessage.senderKey, privateKey);
-                if (decrypted === "[Encrypted Message - Decryption Failed]") {
-                    decrypted = await CryptoUtils.decryptMessage(lastMessage.content, lastMessage.recipientKey, privateKey);
+                // Try decrypting with both senderKey and recipientKey since we don't know the sender in the preview
+                let decrypted: string;
+                try {
+                    decrypted = await CryptoUtils.decryptMessage(lastMessage.content, lastMessage.senderKey, privateKey);
+                } catch (e) {
+                    try {
+                        decrypted = await CryptoUtils.decryptMessage(lastMessage.content, lastMessage.recipientKey, privateKey);
+                    } catch (e2: any) {
+                        if (e2.name === "OperationError") {
+                            console.warn("Sidebar detected key mismatch. Refetching...");
+                            useConversationStore.getState().fetchConversations();
+                        }
+                        decrypted = "[Legacy Message]";
+                    }
                 }
                 
                 setDecryptedPreview(decrypted);

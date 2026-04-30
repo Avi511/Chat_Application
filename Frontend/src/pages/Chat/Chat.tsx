@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuthStore } from "../../stores/authStore";
+import { useConversationStore } from "../../stores/conversationStore";
 import SideBar from "../../components/SlideBar/SlideBar";
 import ChatWindow from "../../components/ChatWindow/ChatWindow";
 
 const Chat = () => {
     const { user, setupE2EE } = useAuthStore();
+    const { activeConversationId } = useConversationStore();
     const [activeRoom, setActiveRoom] = useState("general");
 
     useEffect(() => {
@@ -16,8 +18,8 @@ const Chat = () => {
     if (!user) return null;
 
     return (
-        <div className="relative flex flex-col md:flex-row h-screen bg-slate-950 text-slate-100 overflow-hidden">
-            {/* Ambient Background Blobs matching Auth */}
+        <div className="relative flex h-[100dvh] bg-slate-950 text-slate-100 overflow-hidden">
+            {/* Ambient Background Blobs */}
             <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-0 -left-4 w-96 h-96 bg-cyan-500 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-blob" />
                 <div className="absolute top-0 -right-4 w-96 h-96 bg-blue-500 rounded-full mix-blend-screen filter blur-[100px] opacity-20 animate-blob animation-delay-2000" />
@@ -25,9 +27,16 @@ const Chat = () => {
             </div>
 
             {/* Foreground Content */}
-            <div className="flex w-full h-full z-10 relative bg-slate-950/40 backdrop-blur-3xl">
-                <SideBar />
-                <ChatWindow />
+            <div className="flex w-full h-full z-10 relative bg-slate-950/40 backdrop-blur-3xl overflow-hidden">
+                {/* Sidebar */}
+                <div className={`${activeConversationId ? 'hidden' : 'block'} md:block w-full md:w-[350px] lg:w-[420px] h-full shrink-0 border-r border-white/5`}>
+                    <SideBar />
+                </div>
+
+                {/* ChatWindow */}
+                <div className={`${activeConversationId ? 'block' : 'hidden'} md:block flex-1 h-full min-w-0`}>
+                    <ChatWindow />
+                </div>
             </div>
         </div>
     );

@@ -1,4 +1,5 @@
 import { useAuthStore } from "../../stores/authStore";
+import { useConversationStore } from "../../stores/conversationStore";
 import { useEffect, useState } from "react";
 import { CryptoUtils } from "../../utils/crypto";
 import { Shield } from "lucide-react";
@@ -28,6 +29,7 @@ const MessageItem: React.FC<MessageProps> = ({
     recipientKey
 }) => {
     const { user } = useAuthStore();
+    const { fetchConversations } = useConversationStore();
     const [decryptedContent, setDecryptedContent] = useState<string | null>(null);
     const [isDecrypting, setIsDecrypting] = useState(false);
     
@@ -39,33 +41,44 @@ const MessageItem: React.FC<MessageProps> = ({
         const decrypt = async () => {
             if (!user || !content) return;
             
-            // If it's not encrypted (no keys), just show content
+            // 1. Check if the message is actually encrypted (contains keys)
             if (!senderKey || !recipientKey) {
                 setDecryptedContent(content);
+                setIsDecrypting(false);
+                return;
+            }
+
+            // 2. Wait for Private Key presence
+            const storedPrivateKey = localStorage.getItem(`prv_key_${user.id}`);
+            if (!storedPrivateKey) {
+                // If we are currently setting up E2EE, wait. Otherwise, it's a lost key case.
+                setDecryptedContent("[Encrypted - Private Key Missing]");
+                setIsDecrypting(false);
                 return;
             }
 
             setIsDecrypting(true);
             try {
-                const storedPrivateKey = localStorage.getItem(`prv_key_${user.id}`);
-                if (!storedPrivateKey) {
-                    setDecryptedContent("[Encrypted - No Private Key]");
-                    return;
-                }
-
                 const privateKey = await CryptoUtils.importPrivateKey(storedPrivateKey);
                 const keyToUse = userIsSender ? senderKey : recipientKey;
                 
                 if (!keyToUse) {
-                    setDecryptedContent("[Encrypted - Missing Key]");
+                    setDecryptedContent("[Encrypted - Key Mismatch]");
                     return;
                 }
 
                 const decrypted = await CryptoUtils.decryptMessage(content, keyToUse, privateKey);
                 setDecryptedContent(decrypted);
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Decryption error:", error);
-                setDecryptedContent("[Decryption Failed - Key Mismatch]");
+                
+                // If it's a key mismatch, try to refetch conversations once
+                if (error.name === "OperationError") {
+                    console.warn("Detected key mismatch. Refetching conversations...");
+                    fetchConversations();
+                }
+                
+                setDecryptedContent("[Legacy Message - Unreadable]");
             } finally {
                 setIsDecrypting(false);
             }
@@ -96,7 +109,11 @@ const MessageItem: React.FC<MessageProps> = ({
 
     if (userIsSender) {
         return <div className="flex justify-end mb-4">
-            <div className="bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-3 px-4 max-w-xs lg:max-w-md rounded-2xl rounded-br-sm shadow-[0_0_15px_rgba(34,211,238,0.1)] border border-cyan-400/20">
+            <div className={`relative p-3 md:p-4 rounded-2xl shadow-lg backdrop-blur-md border ${
+                        userIsSender 
+                            ? "bg-gradient-to-br from-cyan-500 to-blue-600 border-cyan-400/20 text-white rounded-tr-none" 
+                            : "bg-white/5 border-white/10 text-slate-100 rounded-tl-none"
+                    } max-w-[85%] md:max-w-md break-words`}>
                 <p className="text-[15px] leading-relaxed">
                     {isDecrypting ? "Decrypting..." : decryptedContent}
                 </p>
@@ -114,8 +131,8 @@ const MessageItem: React.FC<MessageProps> = ({
             alt={sender?.username || "User"}
             className="w-8 h-8 rounded-full object-cover mr-2 mb-1"
         />
-        <div className="bg-slate-900 border border-white/5 p-3 px-4 max-w-xs lg:max-w-md rounded-2xl rounded-bl-sm shadow-sm">
-            <p className="text-[15px] text-slate-200 leading-relaxed">
+        <div className="relative p-3 md:p-4 rounded-2xl shadow-lg backdrop-blur-md border bg-white/5 border-white/10 text-slate-100 rounded-tl-none max-w-[85%] md:max-w-md break-words">
+            <p className="text-[15px] leading-relaxed">
                 {isDecrypting ? "Decrypting..." : decryptedContent}
             </p>
             <div className="flex items-center gap-1 mt-1">

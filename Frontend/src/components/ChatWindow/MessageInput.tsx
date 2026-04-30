@@ -92,12 +92,12 @@ const MessageInput: React.FC = () => {
     };
 
 
-    return <div className="p-4 border-t border-white/10 bg-white/5 backdrop-blur-md z-10">
-        <div className="flex items-center max-w-4xl mx-auto">
+    return <div className="p-3 md:p-4 border-t border-white/10 bg-white/5 backdrop-blur-md z-10">
+        <div className="flex items-center max-w-4xl mx-auto gap-2 md:gap-3">
             <div className="flex-1 relative">
                 <textarea
                     placeholder="Type a message..."
-                    className="w-full text-[15px] bg-slate-800 text-white placeholder:text-slate-500 rounded-full py-3.5 px-5 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 resize-none block overflow-hidden leading-[1.2rem] h-[44px]"
+                    className="w-full text-[15px] bg-slate-800 text-white placeholder:text-slate-500 rounded-2xl md:rounded-full py-3 px-4 md:px-5 focus:outline-none focus:ring-1 focus:ring-cyan-500/50 resize-none block overflow-hidden leading-[1.2rem] h-[44px]"
                     value={message}
                     onChange={(e) => handleOnChange(e)}
                     onKeyDown={(e) => {
@@ -109,7 +109,7 @@ const MessageInput: React.FC = () => {
                 />
             </div>
 
-            <div className="ml-3">
+            <div className="shrink-0">
                 <button
                     onClick={handleSendMessage}
                     type="button"

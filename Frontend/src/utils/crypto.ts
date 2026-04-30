@@ -149,9 +149,9 @@ export class CryptoUtils {
             );
 
             return new TextDecoder().decode(decryptedBuffer);
-        } catch (error) {
-            console.error("Decryption failed:", error);
-            return "[Encrypted Message - Decryption Failed]";
+        } catch (error: any) {
+            console.error("Decryption failed:", error.name, error.message);
+            throw error;
         }
     }
 
