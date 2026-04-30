@@ -163,7 +163,7 @@ export const conversationMarkAsRead = async (io, socket, data) => {
 
 export const conversationSendMessage = async (io, socket, data) => {
     try {
-        const { conversationId, friendId, content } = data;
+        const { conversationId, friendId, content, senderKey, recipientKey } = data;
         const userId = socket.userId;
         const user = socket.user;
 
@@ -189,6 +189,8 @@ export const conversationSendMessage = async (io, socket, data) => {
             conversationId: conversation.id,
             sender: userId,
             content,
+            senderKey,
+            recipientKey
         })
         await message.save();
 
@@ -201,6 +203,8 @@ export const conversationSendMessage = async (io, socket, data) => {
                 username: user.username,
             },
             content,
+            senderKey,
+            recipientKey,
             createdAt: message.createdAt,
             read: message.read,
         }

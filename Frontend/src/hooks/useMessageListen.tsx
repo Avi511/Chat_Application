@@ -42,6 +42,7 @@ export function useMessageListen(
                 }
             )
 
+            /* 
             if (payload.message.sender._id !== user?.id) {
                 try {
                     sound.currentTime = 0;
@@ -50,6 +51,7 @@ export function useMessageListen(
                     console.warn("Audio playback failed", error);
                 }
             }
+            */
 
             setTimeout(() => {
                 if (!containerRef.current) return;

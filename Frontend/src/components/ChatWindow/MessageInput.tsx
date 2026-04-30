@@ -3,6 +3,7 @@ import { useAuthStore } from "../../stores/authStore";
 import { useConversationStore } from "../../stores/conversationStore";
 import { useSocket } from "../../context/SocketContext";
 import { useRef, useState } from "react";
+import { CryptoUtils } from "../../utils/crypto";
 
 const MessageInput: React.FC = () => {
     const { user } = useAuthStore();
@@ -28,20 +29,49 @@ const MessageInput: React.FC = () => {
 
     if (!selectedConversation) return null;
 
-    const handleSendMessage = () => {
-        if (message.trim() === '' || !user || !socket) return;
+    const handleSendMessage = async () => {
+        if (message.trim() === '' || !user || !socket || !selectedConversation) return;
 
-        socket.emit("conversation:send-message", {
-            conversationId: selectedConversation.conversationId,
-            userId: user.id,
-            friendId: selectedConversation.friend.id,
-            content: message.trim(),
-        });
+        try {
+            let payload: any = {
+                conversationId: selectedConversation.conversationId,
+                userId: user.id,
+                friendId: selectedConversation.friend.id,
+                content: message.trim(),
+            };
 
-        setMessage('');
+            // E2EE Encryption
+            if (user.publicKey && selectedConversation.friend.publicKey) {
+                const senderPubKey = await CryptoUtils.importPublicKey(user.publicKey);
+                const recipientPubKey = await CryptoUtils.importPublicKey(selectedConversation.friend.publicKey);
+                
+                const encrypted = await CryptoUtils.encryptMessage(
+                    message.trim(),
+                    recipientPubKey,
+                    senderPubKey
+                );
 
-        if (isTypingRef.current) {
-            emitTyping(false);
+                payload.content = encrypted.content;
+                payload.senderKey = encrypted.senderKey;
+                payload.recipientKey = encrypted.recipientKey;
+                payload.isEncrypted = true;
+            } else {
+                console.warn("E2EE keys missing:", { 
+                    myKey: !!user.publicKey, 
+                    friendKey: !!selectedConversation.friend.publicKey 
+                }, "sending in plaintext...");
+                // Note: For strict E2EE, we might want to block plaintext sending
+            }
+
+            socket.emit("conversation:send-message", payload);
+
+            setMessage('');
+
+            if (isTypingRef.current) {
+                emitTyping(false);
+            }
+        } catch (error) {
+            console.error("Failed to encrypt/send message:", error);
         }
     };
 

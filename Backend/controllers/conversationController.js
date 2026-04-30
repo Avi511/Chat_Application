@@ -49,8 +49,8 @@ class ConversationController {
                     { recipient: userId },
                 ],
             }).populate([
-                { path: 'requester', select: 'id fullName username mobileNumber profilePicture profilePicturePublicId' },
-                { path: 'recipient', select: 'id fullName username mobileNumber profilePicture profilePicturePublicId' },
+                { path: 'requester', select: 'id fullName username mobileNumber profilePicture profilePicturePublicId publicKey' },
+                { path: 'recipient', select: 'id fullName username mobileNumber profilePicture profilePicturePublicId publicKey' },
             ]).lean();
 
             if (!friendships.length) {
@@ -100,6 +100,7 @@ class ConversationController {
                             fullName: friend.fullName,
                             mobileNumber: friend.mobileNumber,
                             profilePicture: friend.profilePicturePublicId ? getSignedUrl(friend.profilePicturePublicId) : friend.profilePicture,
+                            publicKey: friend.publicKey,
                             online: await RedisService.isUserOnline(friend._id.toString()),
                         }
                     }

@@ -2,14 +2,67 @@ import type React from "react";
 import type { Conversation } from "../../context/ConversationContext";
 import { useAuthStore } from "../../stores/authStore";
 import { useConversationStore } from "../../stores/conversationStore";
+import { useEffect, useState } from "react";
+import { CryptoUtils } from "../../utils/crypto";
+import { Shield } from "lucide-react";
 
 const ConversationItem: React.FC<Conversation> = ({
     conversationId, friend, unreadCounts, lastMessage
 }) => {
     const { user } = useAuthStore();
     const { activeConversationId, setActiveConversation } = useConversationStore();
+    const [decryptedPreview, setDecryptedPreview] = useState<string | null>(null);
+    const [isDecrypting, setIsDecrypting] = useState(false);
     
     const isSelected = activeConversationId === conversationId;
+    
+    useEffect(() => {
+        const decrypt = async () => {
+            if (!user || !lastMessage?.content) return;
+
+            // If not encrypted, just show content
+            if (!lastMessage.senderKey || !lastMessage.recipientKey) {
+                setDecryptedPreview(lastMessage.content);
+                return;
+            }
+
+            setIsDecrypting(true);
+            try {
+                const storedPrivateKey = localStorage.getItem(`prv_key_${user.id}`);
+                if (!storedPrivateKey) {
+                    setDecryptedPreview("[Encrypted]");
+                    return;
+                }
+
+                const privateKey = await CryptoUtils.importPrivateKey(storedPrivateKey);
+                const isSentByMe = lastMessage.senderKey && !lastMessage.recipientKey; // This logic might need refinement based on how preview is stored
+                
+                // Usually for preview, we just try both or determine from context.
+                // In my implementation, senderKey is for the sender, recipientKey is for the recipient.
+                // But who is the 'me' in this conversation?
+                
+                // Let's check if the last message was sent by me or the friend.
+                // We don't have senderId in the preview, but we can try to decrypt with both if needed, 
+                // or ideally the backend should have told us who sent it.
+                
+                // Since it's 1-on-1, I'll try decrypting with my private key using both encrypted keys.
+                // One will work, one will fail.
+                
+                let decrypted = await CryptoUtils.decryptMessage(lastMessage.content, lastMessage.senderKey, privateKey);
+                if (decrypted === "[Encrypted Message - Decryption Failed]") {
+                    decrypted = await CryptoUtils.decryptMessage(lastMessage.content, lastMessage.recipientKey, privateKey);
+                }
+                
+                setDecryptedPreview(decrypted);
+            } catch (error) {
+                setDecryptedPreview("[Encrypted]");
+            } finally {
+                setIsDecrypting(false);
+            }
+        };
+
+        decrypt();
+    }, [lastMessage, user]);
     
     const totalUnread = user ? (unreadCounts[user.id] || 0) : 0;
 
@@ -78,9 +131,12 @@ const ConversationItem: React.FC<Conversation> = ({
                 </div>
 
                 <div className="flex items-center justify-between gap-2 mt-0.5">
-                    <p className={`text-[13px] truncate ${isSelected ? "text-slate-300" : "text-slate-400"}`}>
-                        {lastMessage?.content || "Start a conversation..."}
-                    </p>
+                    <div className="flex items-center gap-1 min-w-0">
+                        <p className={`text-[13px] truncate ${isSelected ? "text-slate-300" : "text-slate-400"}`}>
+                            {isDecrypting ? "Decrypting..." : (decryptedPreview || "Start a conversation...")}
+                        </p>
+                        {lastMessage?.senderKey && <Shield size={10} className="text-slate-500 shrink-0" />}
+                    </div>
                     {totalUnread > 0 && (
                         <div className="shrink-0 bg-cyan-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center shadow-[0_0_10px_rgba(34,211,238,0.5)]">
                             {totalUnread > 99 ? '99+' : totalUnread}

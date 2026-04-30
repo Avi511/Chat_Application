@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema({
     profilePicturePublicId: {
         type: String,
         default: ""
+    },
+    publicKey: {
+        type: String,
+        default: ""
     }
 })
 

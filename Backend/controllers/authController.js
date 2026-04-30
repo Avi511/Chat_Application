@@ -102,7 +102,8 @@ class AuthController {
                     fullName: user.fullName,
                     email: user.email,
                     mobileNumber: user.mobileNumber,
-                    profilePicture: user.profilePicturePublicId ? getSignedUrl(user.profilePicturePublicId) : user.profilePicture
+                    profilePicture: user.profilePicturePublicId ? getSignedUrl(user.profilePicturePublicId) : user.profilePicture,
+                    publicKey: user.publicKey
                 }
             })
 
@@ -128,7 +129,8 @@ class AuthController {
                     fullName: user.fullName,
                     email: user.email,
                     mobileNumber: user.mobileNumber,
-                    profilePicture: user.profilePicturePublicId ? getSignedUrl(user.profilePicturePublicId) : user.profilePicture
+                    profilePicture: user.profilePicturePublicId ? getSignedUrl(user.profilePicturePublicId) : user.profilePicture,
+                    publicKey: user.publicKey
                 }
             })
 
@@ -146,10 +148,10 @@ class AuthController {
 
     static async updateProfile(req, res) {
         try {
-            const { fullName, username } = req.body;
+            const { fullName, username, publicKey } = req.body;
             const userId = req.user._id;
 
-            if (!fullName && !username && !req.file) {
+            if (!fullName && !username && !req.file && !publicKey) {
                 return res.status(400).json({ message: "No data provided for update" });
             }
 
@@ -167,6 +169,7 @@ class AuthController {
                 }
                 updateData.username = username;
             }
+            if (publicKey) updateData.publicKey = publicKey;
 
             if (req.file) {
                 // Delete old image from Cloudinary if it exists
@@ -202,7 +205,8 @@ class AuthController {
                     fullName: user.fullName,
                     email: user.email,
                     mobileNumber: user.mobileNumber,
-                    profilePicture: user.profilePicturePublicId ? getSignedUrl(user.profilePicturePublicId) : user.profilePicture
+                    profilePicture: user.profilePicturePublicId ? getSignedUrl(user.profilePicturePublicId) : user.profilePicture,
+                    publicKey: user.publicKey
                 }
             });
 

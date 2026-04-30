@@ -17,6 +17,12 @@ const messageSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    senderKey: {
+        type: String,
+    },
+    recipientKey: {
+        type: String,
+    },
     readBy: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: "User",
@@ -36,6 +42,8 @@ messageSchema.post("save", async function (doc) {
                     lastMessage: doc._id,
                     lastMessagePreview: {
                         content: doc.content,
+                        senderKey: doc.senderKey,
+                        recipientKey: doc.recipientKey,
                         timestamp: doc.createdAt
                     }
                 },

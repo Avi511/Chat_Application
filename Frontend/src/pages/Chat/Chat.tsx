@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthStore } from "../../stores/authStore";
 import SideBar from "../../components/SlideBar/SlideBar";
 import ChatWindow from "../../components/ChatWindow/ChatWindow";
 
 const Chat = () => {
-    const { user } = useAuthStore();
+    const { user, setupE2EE } = useAuthStore();
     const [activeRoom, setActiveRoom] = useState("general");
+
+    useEffect(() => {
+        if (user) {
+            setupE2EE();
+        }
+    }, [user, setupE2EE]);
 
     if (!user) return null;
 
