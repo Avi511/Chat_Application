@@ -143,26 +143,22 @@ export const useAuthStore = create<AuthStore>()(
                 const { user, isLoading } = get();
                 if (!user || isLoading) return;
 
-                // Check if we already have a private key locally
                 const storedPrivateKey = localStorage.getItem(`prv_key_${user.id}`);
                 
-                // If we have everything, we are good
+                // 1. If we have everything, we are good
                 if (storedPrivateKey && user.publicKey) return;
 
-                // If we have a public key on server but no private key locally, 
-                // we can't do much for old messages, but we MUST NOT overwrite 
-                // the server's public key if we want to keep consistency.
-                // However, for this simple implementation, we will generate a new pair 
-                // ONLY if the private key is missing.
-                
+                // 2. If private key is missing but public key exists on server,
+                // we warn and stop to prevent overwriting the server identity.
+                if (!storedPrivateKey && user.publicKey) {
+                    console.warn("E2EE: Private key missing from local storage. You will not be able to decrypt your message history.");
+                    return;
+                }
+
+                // 3. Only generate a new pair if both are missing (Fresh Account/Setup)
                 try {
-                    console.log("Checking E2EE keys...");
-                    
-                    // IF we have a public key on the server but NO private key locally,
-                    // we MUST generate a new pair and overwrite the server key.
-                    // This is the only way to recover and send/receive new messages.
-                    if (!storedPrivateKey) {
-                        console.warn("Private key missing. Performing E2EE Hard Reset...");
+                    if (!storedPrivateKey && !user.publicKey) {
+                        console.log("Generating fresh E2EE key pair...");
                         const keyPair = await CryptoUtils.generateKeyPair();
                         const pubKeyJwk = await CryptoUtils.exportPublicKey(keyPair.publicKey);
                         const prvKeyJwk = await CryptoUtils.exportPrivateKey(keyPair.privateKey);
@@ -174,19 +170,10 @@ export const useAuthStore = create<AuthStore>()(
                         const response = await authService.updateProfile(formData);
                         set({ user: response.user });
                         
-                        console.log("E2EE Hard Reset complete.");
-                    } else if (!user.publicKey) {
-                        // We have private key but server missed the public key
-                        const privateKey = await CryptoUtils.importPrivateKey(storedPrivateKey);
-                        // We can't derive public from private easily in WebCrypto JWK, 
-                        // so we just generate a new pair if the public is missing.
-                        localStorage.removeItem(`prv_key_${user.id}`);
-                        return get().setupE2EE();
+                        console.log("E2EE Setup Complete.");
                     }
-
-                    console.log("E2EE setup verified.");
                 } catch (error) {
-                    console.error("E2EE setup failed:", error);
+                    console.error("E2EE Setup Error:", error);
                 }
             },
         }),

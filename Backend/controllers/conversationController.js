@@ -87,12 +87,14 @@ class ConversationController {
 
                     const conversation = conversationsMap.get(friend._id.toString());
 
+                    if (!conversation) return null;
+
                     return {
-                        conversationId: conversation.id,
+                        conversationId: conversation.id || conversation._id.toString(),
                         lastMessage: conversation.lastMessagePreview || null,
                         unreadCounts: {
-                            [friendship.requester._id.toString()]: conversation.unreadCounts.get(friendship.requester._id.toString()) || 0,
-                            [friendship.recipient._id.toString()]: conversation.unreadCounts.get(friendship.recipient._id.toString()) || 0,
+                            [friendship.requester._id.toString()]: conversation.unreadCounts?.get(friendship.requester._id.toString()) || 0,
+                            [friendship.recipient._id.toString()]: conversation.unreadCounts?.get(friendship.recipient._id.toString()) || 0,
                         },
                         friend: {
                             id: friend._id.toString(),
@@ -107,7 +109,7 @@ class ConversationController {
                 })
             ])
 
-            res.json({ data: conversationsData });
+            res.json({ data: conversationsData.filter(c => c !== null) });
 
 
         } catch (error) {
