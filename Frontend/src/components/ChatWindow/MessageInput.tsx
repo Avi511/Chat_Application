@@ -41,7 +41,26 @@ const MessageInput: React.FC = () => {
             };
 
             // E2EE Encryption
-            if (user.publicKey && selectedConversation.friend.publicKey) {
+            const storedPrivateKey = localStorage.getItem(`prv_key_${user.id}`);
+
+            if (!user.publicKey || !selectedConversation.friend.publicKey) {
+                console.warn("E2EE keys missing. Refresh after key setup.");
+                // Fallback to plaintext if keys are missing (or return if you want strict E2EE)
+            } else if (!storedPrivateKey) {
+                console.error("Cannot send encrypted message: private key missing.");
+                return;
+            } else {
+                const keysMatch = await CryptoUtils.verifyKeyPair(
+                    user.publicKey,
+                    storedPrivateKey
+                );
+
+                if (!keysMatch) {
+                    console.error("Cannot send encrypted message: E2EE key mismatch.");
+                    return;
+                }
+
+                // If everything is correct, encrypt
                 const senderPubKey = await CryptoUtils.importPublicKey(user.publicKey);
                 const recipientPubKey = await CryptoUtils.importPublicKey(selectedConversation.friend.publicKey);
                 
@@ -55,12 +74,6 @@ const MessageInput: React.FC = () => {
                 payload.senderKey = encrypted.senderKey;
                 payload.recipientKey = encrypted.recipientKey;
                 payload.isEncrypted = true;
-            } else {
-                console.warn("E2EE keys missing:", { 
-                    myKey: !!user.publicKey, 
-                    friendKey: !!selectedConversation.friend.publicKey 
-                }, "sending in plaintext...");
-                // Note: For strict E2EE, we might want to block plaintext sending
             }
 
             socket.emit("conversation:send-message", payload);

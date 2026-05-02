@@ -143,37 +143,55 @@ export const useAuthStore = create<AuthStore>()(
                 const { user, isLoading } = get();
                 if (!user || isLoading) return;
 
-                const storedPrivateKey = localStorage.getItem(`prv_key_${user.id}`);
-                
-                // 1. If we have everything, we are good
-                if (storedPrivateKey && user.publicKey) return;
+                const privateKeyName = `prv_key_${user.id}`;
+                const storedPrivateKey = localStorage.getItem(privateKeyName);
 
-                // 2. If private key is missing but public key exists on server,
-                // we warn and stop to prevent overwriting the server identity.
-                if (!storedPrivateKey && user.publicKey) {
-                    console.warn("E2EE: Private key missing from local storage. You will not be able to decrypt your message history.");
-                    return;
-                }
-
-                // 3. Only generate a new pair if both are missing (Fresh Account/Setup)
                 try {
-                    if (!storedPrivateKey && !user.publicKey) {
-                        console.log("Generating fresh E2EE key pair...");
-                        const keyPair = await CryptoUtils.generateKeyPair();
-                        const pubKeyJwk = await CryptoUtils.exportPublicKey(keyPair.publicKey);
-                        const prvKeyJwk = await CryptoUtils.exportPrivateKey(keyPair.privateKey);
+                    // 1. If we have everything, verify they match.
+                    if (storedPrivateKey && user.publicKey) {
+                        const keysMatch = await CryptoUtils.verifyKeyPair(
+                            user.publicKey,
+                            storedPrivateKey
+                        );
 
-                        localStorage.setItem(`prv_key_${user.id}`, prvKeyJwk);
+                        if (keysMatch) {
+                            console.log("E2EE: Keys verified and matching.");
+                            return;
+                        }
+                        
+                        console.warn("E2EE: Key mismatch detected. Generating new keys...");
+                    }
 
+                    // 2. If we have a private key but server is missing public key, re-upload it.
+                    if (storedPrivateKey && !user.publicKey) {
+                        console.log("E2EE: Server missing public key. Re-uploading from local storage...");
+                        const publicKey = CryptoUtils.publicKeyFromPrivateKey(storedPrivateKey);
                         const formData = new FormData();
-                        formData.append("publicKey", pubKeyJwk);
+                        formData.append("publicKey", publicKey);
+
                         const response = await authService.updateProfile(formData);
                         set({ user: response.user });
-                        
-                        console.log("E2EE Setup Complete.");
+                        return;
                     }
+
+                    // 3. If private key is missing or keys mismatched, generate a fresh pair.
+                    console.log("E2EE: Generating fresh key pair...");
+                    const keyPair = await CryptoUtils.generateKeyPair();
+
+                    const publicKey = await CryptoUtils.exportPublicKey(keyPair.publicKey);
+                    const privateKey = await CryptoUtils.exportPrivateKey(keyPair.privateKey);
+
+                    localStorage.setItem(privateKeyName, privateKey);
+
+                    const formData = new FormData();
+                    formData.append("publicKey", publicKey);
+
+                    const response = await authService.updateProfile(formData);
+                    set({ user: response.user });
+
+                    console.log("E2EE setup complete.");
                 } catch (error) {
-                    console.error("E2EE Setup Error:", error);
+                    console.error("E2EE setup error:", error);
                 }
             },
         }),

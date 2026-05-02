@@ -99,6 +99,7 @@ export const conversationRequest = async (io, socket, data) => {
                 fullName: friend.fullName,
                 username: friend.username,
                 mobileNumber: friend.mobileNumber,
+                publicKey: friend.publicKey,
                 online: await RedisService.isUserOnline(friend._id.toString()),
             }
         })
@@ -110,6 +111,7 @@ export const conversationRequest = async (io, socket, data) => {
                 fullName: user.fullName,
                 username: user.username,
                 mobileNumber: user.mobileNumber,
+                publicKey: user.publicKey,
                 online: await RedisService.isUserOnline(user._id.toString()),
             }
         })

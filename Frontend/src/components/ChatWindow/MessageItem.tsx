@@ -70,14 +70,7 @@ const MessageItem: React.FC<MessageProps> = ({
                 const decrypted = await CryptoUtils.decryptMessage(content, keyToUse, privateKey);
                 setDecryptedContent(decrypted);
             } catch (error: any) {
-                console.error("Decryption error:", error);
-                
-                // If it's a key mismatch, try to refetch conversations once
-                if (error.name === "OperationError") {
-                    console.warn("Detected key mismatch. Refetching conversations...");
-                    fetchConversations();
-                }
-                
+                // Decryption failed (usually due to a key mismatch from a DB reset)
                 setDecryptedContent("[Legacy Message - Unreadable]");
             } finally {
                 setIsDecrypting(false);

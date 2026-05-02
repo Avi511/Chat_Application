@@ -14,6 +14,7 @@ interface Conversation {
         fullName: string;
         profilePicture?: string;
         mobileNumber: string;
+        publicKey?: string;
         online: boolean;
         lastSeen: string;
     };

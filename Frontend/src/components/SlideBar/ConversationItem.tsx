@@ -47,10 +47,6 @@ const ConversationItem: React.FC<Conversation> = ({
                     try {
                         decrypted = await CryptoUtils.decryptMessage(lastMessage.content, lastMessage.recipientKey, privateKey);
                     } catch (e2: any) {
-                        if (e2.name === "OperationError") {
-                            console.warn("Sidebar detected key mismatch. Refetching...");
-                            useConversationStore.getState().fetchConversations();
-                        }
                         decrypted = "[Legacy Message]";
                     }
                 }

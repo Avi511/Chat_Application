@@ -155,6 +155,58 @@ export class CryptoUtils {
         }
     }
 
+    /**
+     * Verify that a public key matches a private key
+     */
+    static async verifyKeyPair(
+        publicKeyJwk: string,
+        privateKeyJwk: string
+    ): Promise<boolean> {
+        try {
+            const publicKey = await this.importPublicKey(publicKeyJwk);
+            const privateKey = await this.importPrivateKey(privateKeyJwk);
+
+            const challenge = window.crypto.getRandomValues(new Uint8Array(32));
+
+            const encrypted = await window.crypto.subtle.encrypt(
+                { name: "RSA-OAEP" },
+                publicKey,
+                challenge
+            );
+
+            const decrypted = new Uint8Array(
+                await window.crypto.subtle.decrypt(
+                    { name: "RSA-OAEP" },
+                    privateKey,
+                    encrypted
+                )
+            );
+
+            return (
+                challenge.length === decrypted.length &&
+                challenge.every((byte, index) => byte === decrypted[index])
+            );
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * Derive a public key JWK from a private key JWK string
+     */
+    static publicKeyFromPrivateKey(privateKeyJwk: string): string {
+        const jwk = JSON.parse(privateKeyJwk);
+
+        return JSON.stringify({
+            kty: jwk.kty,
+            n: jwk.n,
+            e: jwk.e,
+            alg: jwk.alg || "RSA-OAEP-256",
+            ext: true,
+            key_ops: ["encrypt"],
+        });
+    }
+
     private static bufferToBase64(buffer: Uint8Array): string {
         let binary = "";
         const len = buffer.byteLength;

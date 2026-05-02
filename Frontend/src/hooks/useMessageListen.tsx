@@ -6,6 +6,8 @@ import { toast } from "sonner"
 import type { Message } from "../services/messageServices";
 
 
+const sound = new Audio("/pop.mp3");
+
 export function useMessageListen(
     conversationId: string | undefined,
     friendId: string | undefined,
@@ -14,7 +16,6 @@ export function useMessageListen(
     const { user } = useAuthStore();
     const { socket } = useSocket();
     const queryClient = useQueryClient();
-    const sound = new Audio("/pop.mp3");
 
     useEffect(() => {
         if (!conversationId || !friendId || !socket) return;
