@@ -1,13 +1,12 @@
-import { LogOut, Settings, Copy, CheckCircle2 } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useAuthStore } from "../../stores/authStore";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+
 
 const UserProfile = () => {
     const { user, logout } = useAuthStore();
     const navigate = useNavigate();
-    const [copied, setCopied] = useState(false);
 
     const handleLogout = async () => {
         try {
@@ -19,14 +18,6 @@ const UserProfile = () => {
         }
     };
 
-    const copyConnectId = () => {
-        if (user?.mobileNumber) {
-            navigator.clipboard.writeText(user.mobileNumber);
-            setCopied(true);
-            toast.success("Mobile number copied!");
-            setTimeout(() => setCopied(false), 2000);
-        }
-    };
 
     if (!user) return null;
 

@@ -6,6 +6,8 @@ interface Conversation {
     lastMessage: {
         content: string;
         timestamp: string;
+        senderKey?: string;
+        recipientKey?: string;
     } | null;
     unreadCounts: Record<string, number>;
     friend: {
@@ -18,7 +20,7 @@ interface Conversation {
         online: boolean;
         lastSeen: string;
     };
-    friendshipId: string;
+    friendshipId?: string;
 }
 
 interface ConversationStore {

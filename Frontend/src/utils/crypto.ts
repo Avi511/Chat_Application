@@ -94,7 +94,7 @@ export class CryptoUtils {
             const rawAesKey = await window.crypto.subtle.decrypt(
                 { name: "RSA-OAEP" },
                 privateKey,
-                encryptedKeyBuffer
+                encryptedKeyBuffer as any
             );
 
             const aesKey = await window.crypto.subtle.importKey(

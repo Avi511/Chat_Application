@@ -55,7 +55,7 @@ const Auth = () => {
                     {isLogin ? (
                         <LoginForm navigate={navigate} />
                     ) : (
-                        <RegisterForm navigate={navigate} onSuccess={() => setIsLogin(true)} />
+                        <RegisterForm onSuccess={() => setIsLogin(true)} />
                     )}
 
                     <div className="mt-8 text-center border-t border-white/10 pt-6">

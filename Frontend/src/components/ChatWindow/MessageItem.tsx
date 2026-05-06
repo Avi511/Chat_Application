@@ -1,5 +1,5 @@
 import { useAuthStore } from "../../stores/authStore";
-import { useConversationStore } from "../../stores/conversationStore";
+
 import { useEffect, useState } from "react";
 import { CryptoUtils } from "../../utils/crypto";
 import { Shield } from "lucide-react";
@@ -29,7 +29,7 @@ const MessageItem: React.FC<MessageProps> = ({
     recipientKey
 }) => {
     const { user } = useAuthStore();
-    const { fetchConversations } = useConversationStore();
+
     const [decryptedContent, setDecryptedContent] = useState<string | null>(null);
     const [isDecrypting, setIsDecrypting] = useState(false);
     

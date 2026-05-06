@@ -5,7 +5,7 @@ import * as z from "zod";
 import { useAuthStore } from "../../../stores/authStore";
 import { toast } from "sonner";
 import { Mail, Lock, User, Loader2, Eye, EyeOff, ShieldCheck, AtSign, Phone, Image as ImageIcon, Camera, X } from "lucide-react";
-import type { NavigateFunction } from "react-router-dom";
+
 
 const registerSchema = z.object({
     fullName: z.string().min(2, "Full name must be at least 2 characters"),
@@ -23,11 +23,11 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 interface RegisterFormProps {
-    navigate: NavigateFunction;
+
     onSuccess: () => void;
 }
 
-const RegisterForm = ({ navigate, onSuccess }: RegisterFormProps) => {
+const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
     const { register: registerUser, isLoading } = useAuthStore();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);

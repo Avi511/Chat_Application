@@ -16,6 +16,8 @@ export type Conversation = {
     lastMessage: {
         content: string;
         timestamp: string;
+        senderKey?: string;
+        recipientKey?: string;
     } | null;
     unreadCounts: Record<string, number>;
     friend: {

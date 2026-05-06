@@ -6,7 +6,6 @@ import { toast } from "sonner"
 import type { Message } from "../services/messageServices";
 
 
-const sound = new Audio("/pop.mp3");
 
 export function useMessageListen(
     conversationId: string | undefined,
