@@ -2,8 +2,6 @@
 
 **Chat Pad** is a state-of-the-art, high-performance real-time messaging platform prioritizing user privacy and security through robust **End-to-End Encryption (E2EE)**. Designed with a sleek, modern UI, Chat Pad delivers a seamless chat experience akin to leading messaging applications, without compromising on data security.
 
-![Chat Pad Demo](https://chat-application-pi-rouge.vercel.app/)
-
 ## 🌟 Key Features
 
 ### 🔒 Military-Grade Security
@@ -71,7 +69,7 @@ Ensure you have the following installed:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/yourusername/chat-pad.git
+git clone https://github.com/Avi511/Chat_Application
 cd chat-pad
 ```
 
