@@ -91,8 +91,8 @@ class AuthController {
             res.cookie("jwt", token, {
                 maxAge: 7 * 24 * 60 * 60 * 1000,
                 httpOnly: true,
-                sameSite: 'strict',
-                secure: process.env.NODE_ENV !== "development"
+                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+                secure: process.env.NODE_ENV === "production"
             })
 
             res.status(200).json({
@@ -141,8 +141,14 @@ class AuthController {
     }
 
     static async logout(req, res) {
-        res.cookie("jwt", "", { maxAge: 0 });
-        res.cookie("token", "", { maxAge: 0 });
+        const cookieOptions = {
+            maxAge: 0,
+            httpOnly: true,
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+            secure: process.env.NODE_ENV === "production"
+        };
+        res.cookie("jwt", "", cookieOptions);
+        res.cookie("token", "", cookieOptions);
         res.json({ message: "Logged out successfully!" });
     }
 
