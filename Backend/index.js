@@ -18,10 +18,16 @@ connectDB();
 
 const app = express();
 const server = http.createServer(app);
+const clientOrigin = process.env.CLIENT_ORIGIN ? process.env.CLIENT_ORIGIN.trim() : "*";
+
+const corsOptions = {
+    origin: clientOrigin,
+    credentials: true,
+};
+
 const io = new Server(server, {
     cors: {
-        origin: process.env.CLIENT_ORIGIN,
-        credentials: true,
+        ...corsOptions,
         methods: ["GET", "POST"]
     },
     pingTimeout: 60000,
@@ -31,10 +37,7 @@ const io = new Server(server, {
 app.set("io", io);
 io.use(socketAuthMiddleware);
 
-app.use(cors({
-    origin: process.env.CLIENT_ORIGIN,
-    credentials: true,
-}));
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 
